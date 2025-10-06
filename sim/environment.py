@@ -73,3 +73,61 @@ class Room:
 
         # Random seed for later stochastic events (kept for determinism)
         self._seed = seed
+
+    def step(self, dt: float, q_cool_kw: float = 0.0) -> None:
+        """
+        Advance thermal model by dt seconds with q_cool_kw cooling input.
+
+        Args:
+            dt: Time step in seconds
+            q_cool_kw: Cooling power supplied by CRAC/chiller (kW)
+
+        Engineering notes:
+            - Heat balance: Q_net = Q_server - Q_cool - Q_envelope
+            - Q_envelope = UA_total * (T_room - T_ambient)
+            - Temperature update: dT/dt = Q_net / thermal_mass
+            - Energy integration for KPI tracking
+        """
+        # Total UA coefficient (envelope + infiltration)
+        ua_total = self.cfg.ua_kw_per_c + self.infil_ua_kw_per_c
+
+        # Heat flows (kW)
+        q_server_kw = self.it_load_kw
+        q_envelope_kw = ua_total * (self.temp_c - self.ambient_temp_c)
+
+        # Net heat balance (kW)
+        q_net_kw = q_server_kw - q_cool_kw - q_envelope_kw
+
+        # Temperature update (°C/s = kW / (kJ/°C) * (1000 J/kJ))
+        dt_temp_c = (q_net_kw * 1000.0 / self.cfg.thermal_mass_kj_per_c) * dt
+        self.temp_c += dt_temp_c
+
+        # Safety bounds
+        self.temp_c = max(self.min_temp_c, min(self.max_temp_c, self.temp_c))
+
+        # Energy integration (kWh = kW * hours)
+        dt_hours = dt / 3600.0
+        self.cooling_energy_kwh += q_cool_kw * dt_hours
+        self.server_energy_kwh += q_server_kw * dt_hours
+
+        # Time tracking
+        self.time_s += dt
+
+    def get_state(self) -> dict:
+        """
+        Return current room state for telemetry/logging.
+
+        Returns dictionary with all key thermal and energy states
+        in engineering units (°C, kW, kWh, seconds).
+        """
+        return {
+            'temp_c': self.temp_c,
+            'ambient_temp_c': self.ambient_temp_c,
+            'it_load_kw': self.it_load_kw,
+            'infil_ua_kw_per_c': self.infil_ua_kw_per_c,
+            'time_s': self.time_s,
+            'cooling_energy_kwh': self.cooling_energy_kwh,
+            'server_energy_kwh': self.server_energy_kwh,
+            'thermal_mass_kj_per_c': self.cfg.thermal_mass_kj_per_c,
+            'ua_kw_per_c': self.cfg.ua_kw_per_c
+        }

@@ -267,25 +267,21 @@
   },
   {
     "id": "alarms_table",
-    "type": "ui_table",
+    "type": "ui_template",
     "z": "main_flow",
     "group": "alarms_group",
     "name": "Active Alarms",
     "order": 1,
     "width": "12",
     "height": "3",
-    "columns": [
-      {"field": "ts", "title": "Time", "width": "", "align": "left", "formatter": "datetime", "formatterParams": {"inputFormat": "iso", "outputFormat": "HH:mm:ss"}},
-      {"field": "prio", "title": "Priority", "width": "", "align": "center", "formatter": "color", "formatterParams": {"HIGH": "#e74c3c", "MEDIUM": "#f39c12", "LOW": "#27ae60"}},
-      {"field": "code", "title": "Code", "width": "", "align": "center", "formatter": "plaintext"},
-      {"field": "asset", "title": "Asset", "width": "", "align": "center", "formatter": "plaintext"},
-      {"field": "state", "title": "State", "width": "", "align": "center", "formatter": "color", "formatterParams": {"ACTIVE": "#e74c3c", "ACK": "#f39c12", "CLEARED": "#27ae60"}}
-    ],
-    "outputs": 0,
-    "cts": false,
+    "format": "<div style=\"background: white; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);\">\n  <!-- Header -->\n  <div style=\"background: #34495e; color: white; padding: 10px; font-weight: bold; display: grid; grid-template-columns: 80px 80px 120px 80px 80px; gap: 10px; font-size: 13px;\">\n    <div>Time</div>\n    <div>Priority</div>\n    <div>Code</div>\n    <div>Asset</div>\n    <div>State</div>\n  </div>\n  \n  <!-- No Alarms Message -->\n  <div ng-if=\"!msg.payload || msg.payload.length === 0\" style=\"padding: 20px; text-align: center; color: #27ae60; font-weight: bold;\">\n    ✅ No Active Alarms - System Normal\n  </div>\n  \n  <!-- Alarm Rows -->\n  <div ng-repeat=\"alarm in msg.payload\" style=\"display: grid; grid-template-columns: 80px 80px 120px 80px 80px; gap: 10px; padding: 8px 10px; border-bottom: 1px solid #ecf0f1; font-size: 12px; align-items: center;\"\n       ng-style=\"{'background': $index % 2 === 0 ? '#f8f9fa' : 'white'}\">\n    \n    <!-- Time -->\n    <div style=\"font-family: monospace;\">{{alarm.ts | date:'HH:mm:ss'}}</div>\n    \n    <!-- Priority Badge -->\n    <div>\n      <span style=\"padding: 2px 6px; border-radius: 10px; font-size: 10px; font-weight: bold; color: white;\"\n            ng-style=\"{'background': alarm.prio === 'HIGH' ? '#e74c3c' : alarm.prio === 'MEDIUM' ? '#f39c12' : '#27ae60'}\">{{alarm.prio}}</span>\n    </div>\n    \n    <!-- Code -->\n    <div style=\"font-weight: bold; color: #2c3e50;\">{{alarm.code}}</div>\n    \n    <!-- Asset -->\n    <div style=\"color: #7f8c8d;\">{{alarm.asset}}</div>\n    \n    <!-- State Badge -->\n    <div>\n      <span style=\"padding: 2px 6px; border-radius: 10px; font-size: 10px; font-weight: bold; color: white;\"\n            ng-style=\"{'background': alarm.state === 'ACTIVE' ? '#e74c3c' : alarm.state === 'ACK' ? '#f39c12' : '#27ae60'}\">{{alarm.state}}</span>\n    </div>\n  </div>\n</div>",
+    "storeOutMessages": true,
+    "fwdInMessages": true,
+    "resendOnRefresh": true,
+    "templateScope": "local",
     "x": 820, 
     "y": 180,
-    "wires": []
+    "wires": [[]]
   },
   {
     "id": "kpi_display",

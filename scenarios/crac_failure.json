@@ -1,0 +1,45 @@
+{
+  "scenario": {
+    "name": "CRAC LEAD Failure Test", 
+    "description": "LEAD unit fails at t=300s, expect LAG promotion within 15s",
+    "duration_minutes": 12.0,
+    "setpoint_c": 22.0,
+    "initial_temp_c": 22.0
+  },
+  
+  "room_config": {
+    "initial_temp_c": 22.0,
+    "ambient_temp_c": 22.0,
+    "thermal_mass_kj_per_c": 2500.0,
+    "ua_kw_per_c": 0.25,
+    "it_load_kw": 50.0,
+    "infil_ua_kw_per_c": 0.0,
+    "n_virtual_sensors": 3
+  },
+  
+  "failure_events": [
+    {
+      "type": "crac_failure",
+      "target_unit": "LEAD",
+      "failure_time_s": 300.0,
+      "duration_hours": 1.0,
+      "description": "Force LEAD CRAC failure at t=5min for 1 hour"
+    }
+  ],
+  
+  "expected_behavior": {
+    "role_promotion_time_s": 15.0,
+    "max_temp_rise_c": 1.0,
+    "no_high_temp_alarm": true,
+    "backup_unit_active": true,
+    "description": "LAG should be promoted to LEAD role within 15s of failure"
+  },
+  
+  "validation_criteria": {
+    "max_temperature_c": 24.0,
+    "max_promotion_time_s": 30.0,
+    "min_backup_capacity_pct": 80.0,
+    "alarm_tolerance": ["CRAC_FAIL"],
+    "required_alarms": ["CRAC_FAIL"]
+  }
+}

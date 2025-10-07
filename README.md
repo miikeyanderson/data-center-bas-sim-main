@@ -1,17 +1,23 @@
 # Data Center BAS Control System
 
-A Building Automation System (BAS) simulation for data center cooling. Shows control strategies, alarms, and testing workflows used in data centers.
+What this is: A config-driven data center cooling BAS simulation with PID control, lead/lag/standby sequencing, alarm lifecycle, fault injection, and a Node-RED HMI for real-time monitoring and diagnostics.
+What this shows: The same engineering workflows used in the field—commissioning, diagnostics, real-time monitoring, custom graphics, and energy efficiency analysis.
 
-## 🚀 2-Minute Overview (Hiring Manager Skim)
+## System Highlights
 
-**Live Demo** → [![Live Demo](https://img.shields.io/badge/Live-Demo-4B87FF?style=for-the-badge)](https://data-center-bas-control-system-9e91036e3a33.herokuapp.com/) | **System Architecture** → ![System Overview](reports/system_overview.png) | **Commissioning Report** → [📋 Full Report](reports/commissioning.md)
+### Quick Access
+| Component | Link |
+|-----------|------|
+| **Live Demo** | [![Live Demo](https://img.shields.io/badge/Live-Demo-4B87FF?style=for-the-badge)](https://data-center-bas-control-system-9e91036e3a33.herokuapp.com/) |
+| **System Architecture** | ![System Overview](reports/system_overview.png) |
+| **Commissioning Report** | [Full Report](reports/commissioning.md) |
 
 ### Key Engineering Results
 - **Temperature Control**: 95.8% accuracy within ±0.5°C (benchmarked against ASHRAE ±1.0°C criteria under simulated conditions)
 - **N+1 Redundancy**: <15s failover time with automatic role promotion
 - **Energy Efficiency**: COP 3.24 (benchmarked against Energy Star 2.5 criteria under simulated conditions)
 
-> **📋 Assumptions & Limits**: Single zone model, CRAC proxy units, dry-coil thermal model; humidity control and economizer operations not modeled yet.
+> **Assumptions & Limits**: Single zone model, CRAC proxy units, dry-coil thermal model; humidity control and economizer operations not modeled yet.
 
 ---
 
@@ -34,9 +40,9 @@ A Building Automation System (BAS) simulation for data center cooling. Shows con
 - [**Performance Benchmarks**](#performance-benchmarks) - Simulation speed, memory usage, scalability testing
 - [**Industry Comparison**](#comparison-against-real-systems) - Accuracy validation against real BAS systems
 
-## Use Case: How This Mirrors Real BAS Work (Data Center)
+## How This Mirrors Real BAS Work
 
-**Direct Employer Application**: This simulation shows core **Building Automation System (BAS) engineering skills** used by companies like DynaTen:
+This simulation replicates the core systems and challenges found in professional data center Building Automation System (BAS) environments:
 
 **Real-Time Equipment Monitoring**: Live dashboard with custom graphics, trend displays, and 24/7 web-based monitoring  
 **Diagnostics**: Root cause analysis with sensor drift detection, equipment failure prediction, and early notification  
@@ -45,7 +51,7 @@ A Building Automation System (BAS) simulation for data center cooling. Shows con
 **Reliable Control Systems**: Multi-unit CRAC staging with N+1 redundancy, failover, and consistent building operations  
 **Indoor Air Quality Control**: Anti-windup temperature control with P/I/D term analysis maintaining comfort standards
 
-**BAS Industry Applications**: Data center cooling, facility temperature control, HVAC control systems, energy management, commissioning, system integration, and predictive maintenance diagnostics.
+**Real-World Applications**: Data center cooling, facility temperature control, HVAC control systems, energy management, commissioning, system integration, and predictive maintenance diagnostics.
 
 ## Control Performance Analysis
 

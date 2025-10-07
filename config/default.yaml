@@ -12,7 +12,7 @@ room:
   ambient_temp_c: 22.0              # Ambient/outside temperature (°C)
   thermal_mass_kj_per_c: 2500.0     # Thermal mass (kJ/°C) - medium data center
   ua_kw_per_c: 0.08                 # Envelope heat transfer coefficient (kW/°C) - optimized for demos
-  it_load_kw: 40.0                  # IT server load (kW)
+  it_load_kw: 25.0                  # IT server load (kW) - reduced for demo stability
   infil_ua_kw_per_c: 0.0            # Infiltration heat transfer (kW/°C)
   n_virtual_sensors: 3              # Number of virtual temperature sensors
 
@@ -35,8 +35,8 @@ crac_units:
     rated_airflow_cfm: 8000.0       # Rated airflow (CFM)
     min_capacity_pct: 20.0          # Minimum capacity (%)
     max_capacity_pct: 100.0         # Maximum capacity (%)
-    startup_time_s: 30.0            # Startup time (seconds) - reduced for demos
-    shutdown_time_s: 15.0           # Shutdown time (seconds) - reduced for demos
+    startup_time_s: 1.0             # Startup time (seconds) - minimal for demos
+    shutdown_time_s: 1.0            # Shutdown time (seconds) - minimal for demos
     mtbf_hours: 8760.0              # Mean time between failures (hours) - 1 year
     mttr_hours: 4.0                 # Mean time to repair (hours)
 
@@ -46,8 +46,8 @@ crac_units:
     rated_airflow_cfm: 8000.0       # Rated airflow (CFM)
     min_capacity_pct: 20.0
     max_capacity_pct: 100.0
-    startup_time_s: 30.0            # Startup time (seconds) - reduced for demos
-    shutdown_time_s: 15.0           # Shutdown time (seconds) - reduced for demos
+    startup_time_s: 1.0             # Startup time (seconds) - minimal for demos
+    shutdown_time_s: 1.0            # Shutdown time (seconds) - minimal for demos
     mtbf_hours: 8760.0
     mttr_hours: 4.0
 
@@ -57,8 +57,8 @@ crac_units:
     rated_airflow_cfm: 8000.0       # Rated airflow (CFM)
     min_capacity_pct: 20.0
     max_capacity_pct: 100.0
-    startup_time_s: 30.0            # Startup time (seconds) - reduced for demos
-    shutdown_time_s: 15.0           # Shutdown time (seconds) - reduced for demos
+    startup_time_s: 1.0             # Startup time (seconds) - minimal for demos
+    shutdown_time_s: 1.0            # Shutdown time (seconds) - minimal for demos
     mtbf_hours: 8760.0
     mttr_hours: 4.0
 

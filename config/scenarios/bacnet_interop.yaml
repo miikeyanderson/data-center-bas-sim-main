@@ -51,15 +51,27 @@ simulation:
 # Moderate load scenario for realistic BACnet data
 room:
   initial_temp_c: 22.0               # Start at setpoint
-  it_load_kw: 50.0                   # Moderate IT load (50kW)
+  it_load_kw: 25.0                   # Reduced IT load for demo stability
   thermal_mass_kj_per_c: 2500.0      # Standard thermal mass
 
 # Tuned PID for stable BACnet data streams
 pid_controller:
-  kp: 2.5                           # Slightly less aggressive for stability
-  ki: 0.12                          # Moderate integral gain
-  kd: 0.06                          # Light derivative action
-  rate_limit: 12.0                  # Moderate rate limiting
+  kp: 15.0                          # Increased for better response
+  ki: 0.5                           # Increased integral gain for steady-state
+  kd: 0.1                           # Light derivative action
+  rate_limit: 50.0                  # Increased for faster demo response
+
+# CRAC units optimized for demo responsiveness
+crac_units:
+  - unit_id: "CRAC-01"
+    startup_time_s: 1.0             # Fast startup for demos
+    shutdown_time_s: 1.0            # Fast shutdown for demos
+  - unit_id: "CRAC-02"
+    startup_time_s: 1.0             # Fast startup for demos
+    shutdown_time_s: 1.0            # Fast shutdown for demos
+  - unit_id: "CRAC-03"
+    startup_time_s: 1.0             # Fast startup for demos
+    shutdown_time_s: 1.0            # Fast shutdown for demos
 
 # CRAC staging optimized for BACnet demonstration
 staging_config:

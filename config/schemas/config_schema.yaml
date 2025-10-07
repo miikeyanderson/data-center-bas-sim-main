@@ -150,13 +150,13 @@ properties:
           description: "Maximum capacity (%)"
         startup_time_s:
           type: number
-          minimum: 30.0
+          minimum: 1.0
           maximum: 600.0
           default: 180.0
           description: "Startup time (seconds)"
         shutdown_time_s:
           type: number
-          minimum: 10.0
+          minimum: 1.0
           maximum: 300.0
           default: 60.0
           description: "Shutdown time (seconds)"

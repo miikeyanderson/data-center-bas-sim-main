@@ -18,23 +18,49 @@ This system simulates a typical data center cooling plant with multiple CRAC uni
 
 ## Architecture
 
+### System Overview
+
+```mermaid
+flowchart LR
+  subgraph Room["Room Thermal Model"]
+    IT[IT Load 35–70 kW] --> HeatBalance[Heat Balance]
+    HeatBalance --> T[Space Temperature]
+  end
+
+  subgraph Control["Control System"]
+    PID[PID Controller<br/>anti-windup]
+    Seq[Sequencer<br/>lead/lag/standby]
+    AM[Alarm Manager]
+  end
+
+  subgraph CRACs["CRAC Units (3×50 kW)"]
+    L[CRAC-01: LEAD]
+    G[CRAC-02: LAG] 
+    S[CRAC-03: STANDBY]
+  end
+
+  subgraph Monitoring["Monitoring & Data"]
+    NR[Node-RED HMI]
+    CSV[CSV Historian]
+    CFG[Config Platform]
+  end
+
+  T --> PID --> Seq --> L
+  Seq --> G
+  Seq --> S
+  L -->|Cooling| T
+  G -->|Cooling| T
+  S -->|Failover| T
+  PID --> AM
+  AM --> NR
+  T --> CSV
+  L --> CSV
+  G --> CSV
+  S --> CSV
+  CFG --> Control
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Room Thermal  │    │  Control System  │    │  CRAC Units     │
-│   Model         │◄──►│  • PID Controller│◄──►│  • Lead/Lag     │
-│   • 35-70kW IT  │    │  • Sequencer     │    │  • Standby      │
-│   • Heat Balance│    │  • Alarm Mgr     │    │  • 50kW Each    │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-         │                       │                       │
-         └───────────────────────┼───────────────────────┘
-                                 ▼
-                    ┌──────────────────────┐
-                    │    Monitoring        │
-                    │  • Node-RED HMI      │
-                    │  • CSV Historian     │
-                    │  • Config Platform   │
-                    └──────────────────────┘
-```
+
+*This architecture demonstrates modular design with clear separation of concerns, enabling independent testing of thermal dynamics, control algorithms, and monitoring systems.*
 
 ## Quick Start
 
@@ -154,11 +180,62 @@ All configurations are validated against comprehensive JSON schemas ensuring:
 - **Setpoint**: 22°C ±0.5°C accuracy under normal operation
 - **Response Time**: <5 minutes for load changes up to 100% of design capacity
 
+#### PID Control Loop Design
+
+```mermaid
+flowchart LR
+  subgraph PID["PID with Anti-Windup"]
+    SP[Setpoint 22°C] --> E[Error e = SP - T]
+    T[Measured Temp] --> E
+    E --> P[Proportional<br/>Kp*e]
+    E --> I[Integral<br/>Ki∫e dt]
+    E --> D[Derivative<br/>Kd de/dt]
+    P --> SUM
+    I --> SUM
+    D --> SUM
+    SUM[Sum → Demand] --> Clamp{Clamp to limits}
+    Clamp -->|u| Output[u → Sequencer]
+    Clamp -->|back-calc| I
+  end
+```
+
+*Professional PID implementation with derivative-on-measurement and conditional integration to prevent windup during saturation conditions.*
+
 ### CRAC Coordination
 - **Lead Unit**: Primary cooling, runs continuously at minimum load
 - **Lag Unit**: Stages when temperature error exceeds 0.8°C for >3 minutes  
 - **Standby Unit**: Activates only during equipment failures
 - **Role Rotation**: Automatic daily rotation for even equipment wear
+
+#### Staging Sequence Logic
+
+```mermaid
+sequenceDiagram
+  participant Room as Room Temp
+  participant PID as PID Controller
+  participant Seq as Sequencer
+  participant Lead as CRAC-01 (LEAD)
+  participant Lag as CRAC-02 (LAG)
+  participant Standby as CRAC-03 (STANDBY)
+  participant Alarm as Alarm Manager
+
+  Room->>PID: Measured T
+  PID->>Seq: Cooling demand (kW)
+  activate Seq
+  Seq->>Lead: Command min cooling (run continuous)
+  Note over Seq: If error > 0.8°C for > 180s → stage LAG
+  Seq->>Lag: Start & modulate
+  Lead-->>Room: Sensible cooling
+  Lag-->>Room: Additional cooling
+
+  Note over Lead: Fault detected (no cooling output)
+  Lead->>Alarm: CRAC_FAIL
+  Seq->>Standby: Promote STANDBY → active
+  Alarm-->>Monitoring: Critical alarm (priority & debounce)
+  deactivate Seq
+```
+
+*Demonstrates automated staging thresholds, anti-short-cycle protection, and fault-tolerant role promotion for N+1 redundancy.*
 
 ### Redundancy & Failover
 - **N+1 Configuration**: System maintains cooling with any single CRAC failure
@@ -172,6 +249,27 @@ All configurations are validated against comprehensive JSON schemas ensuring:
 - `LOW_TEMP` - Space temperature <18°C for >2 minutes (Critical)
 - `CRAC_FAIL` - Unit commanded but no cooling output (High)  
 - `SENSOR_STUCK` - Temperature reading unchanged >10 minutes (Medium)
+
+#### Alarm Lifecycle State Machine
+
+```mermaid
+stateDiagram-v2
+  [*] --> Debounce
+  Debounce --> Active: condition true for N seconds
+  Debounce --> [*]: condition clears early
+  Active --> Acknowledged: operator ack
+  Active --> Cleared: condition clears
+  Acknowledged --> Cleared: condition clears
+  Cleared --> [*]
+  
+  note right of Active
+    Priority classification:<br/>
+    Critical / High / Medium / Low<br/>
+    with proper escalation
+  end note
+```
+
+*Professional alarm handling with debounce timers to prevent nuisance alarms and proper state management for operations teams.*
 
 **Features:**
 - Priority-based classification with proper escalation
@@ -221,6 +319,36 @@ python main.py benchmark --config config/default.yaml --iterations 5
 - CRAC status table showing role, capacity, and power consumption
 - Manual controls for setpoint adjustment and equipment testing
 - Historical trending with configurable data retention
+
+#### Telemetry Data Flow
+
+```mermaid
+flowchart LR
+  Sim[Simulation Outputs] -->|1–60s sampling| Hist[CSV Historian]
+  Hist --> Ret[Rotation & Retention]
+  Sim --> HMI[Node-RED Dashboard]
+  HMI --> Ops[Operator Actions]
+  Ops --> Sim
+  
+  subgraph Telemetry
+    T[Temperature], Pwr[Power], Role[CRAC Role], Al[Alarms]
+  end
+  
+  Sim --> T
+  Sim --> Pwr  
+  Sim --> Role
+  Sim --> Al
+  
+  subgraph Interfaces
+    HTTP[HTTP API], WS[WebSocket], MQTT[MQTT]
+  end
+  
+  HMI --> HTTP
+  HMI --> WS
+  HMI --> MQTT
+```
+
+*Complete data pipeline from simulation to visualization with multiple integration options for external systems and real-time operator control.*
 
 ### Data Logging
 - CSV historian with configurable 1-60 second sampling

@@ -673,6 +673,136 @@ app.get('/ui', (req, res) => {
             energyChart.fillText('Cooling', 10, 35);
         }
         
+        // Update floorplan with real-time data
+        function updateFloorplan(zoneTemp, setpoint, leadPct, lagOn, power, cooling, cop) {
+            // Generate individual rack temperatures with realistic variation
+            const baseTemp = zoneTemp;
+            const rackTemps = [];
+            
+            // Simulate temperature distribution across racks
+            for (let i = 1; i <= 11; i++) {
+                // Add positional variation (edge racks run slightly warmer)
+                const positionFactor = (i === 1 || i === 11) ? 0.5 : 0;
+                // Add load variation (some racks have higher IT load)
+                const loadFactor = (i === 4 || i === 9) ? 0.3 : 0;
+                // Add random variation
+                const randomFactor = (Math.random() - 0.5) * 0.6;
+                
+                const rackTemp = baseTemp + positionFactor + loadFactor + randomFactor;
+                rackTemps.push(rackTemp);
+            }
+            
+            // Update rack temperature sensors
+            rackTemps.forEach((temp, index) => {
+                const rackId = 'A' + (index + 1);
+                const tempSensor = document.querySelector('.temp-sensor[data-temp]');
+                
+                // Find the specific rack's sensor
+                const rack = document.querySelector('[data-rack="' + rackId + '"]');
+                if (rack) {
+                    const sensor = rack.parentNode.querySelector('.temp-sensor');
+                    const tempText = rack.parentNode.querySelector('text:last-child');
+                    
+                    if (sensor && tempText) {
+                        // Update temperature value
+                        sensor.setAttribute('data-temp', temp.toFixed(1));
+                        tempText.textContent = Math.round(temp) + '°';
+                        
+                        // Update sensor color based on temperature
+                        if (temp >= 75) {
+                            sensor.setAttribute('fill', '#ef4444'); // Red - Critical
+                        } else if (temp >= 73) {
+                            sensor.setAttribute('fill', '#f59e0b'); // Amber - Warning
+                        } else {
+                            sensor.setAttribute('fill', '#10b981'); // Green - Normal
+                        }
+                    }
+                }
+            });
+            
+            // Update CRAC unit status
+            const crac01 = document.getElementById('crac-01');
+            const crac02 = document.getElementById('crac-02');
+            const crac03 = document.getElementById('crac-03');
+            
+            // CRAC-01 (LEAD) - Always running
+            if (crac01) {
+                crac01.querySelector('rect').setAttribute('fill', '#27ae60'); // Green
+                crac01.querySelector('.status-indicator').setAttribute('fill', '#a3f7a3');
+            }
+            
+            // CRAC-02 (LAG) - Based on staging
+            if (crac02) {
+                if (lagOn) {
+                    crac02.querySelector('rect').setAttribute('fill', '#3498db'); // Blue - Active
+                    crac02.querySelector('.status-indicator').setAttribute('fill', '#5dade2');
+                } else {
+                    crac02.querySelector('rect').setAttribute('fill', '#7f8c8d'); // Gray - Standby
+                    crac02.querySelector('.status-indicator').setAttribute('fill', '#bdc3c7');
+                }
+            }
+            
+            // CRAC-03 (STANDBY) - Always ready
+            if (crac03) {
+                crac03.querySelector('rect').setAttribute('fill', '#95a5a6'); // Gray
+                crac03.querySelector('.status-indicator').setAttribute('fill', '#bdc3c7');
+            }
+            
+            // Update floorplan summary metrics
+            const avgTemp = rackTemps.reduce((sum, temp) => sum + temp, 0) / rackTemps.length;
+            const totalAirflow = 8000 + (lagOn ? 8000 : 0); // CFM per CRAC
+            const loadUtilization = ((power / 50) * 100); // Percentage of total capacity
+            
+            const avgTempElement = document.getElementById('floorplan-avg-temp');
+            const airflowElement = document.getElementById('floorplan-airflow');
+            const loadElement = document.getElementById('floorplan-load');
+            
+            if (avgTempElement) avgTempElement.textContent = avgTemp.toFixed(1) + '°F';
+            if (airflowElement) airflowElement.textContent = totalAirflow.toLocaleString() + ' CFM';
+            if (loadElement) loadElement.textContent = loadUtilization.toFixed(0) + '%';
+            
+            // Update system status
+            const statusElement = document.getElementById('floorplan-status');
+            if (statusElement) {
+                const criticalRacks = rackTemps.filter(temp => temp >= 75).length;
+                const warningRacks = rackTemps.filter(temp => temp >= 73 && temp < 75).length;
+                
+                if (criticalRacks > 0) {
+                    statusElement.textContent = 'Critical: ' + criticalRacks + ' rack(s) >75°F - Check cooling distribution';
+                    statusElement.className = 'text-xs fill-alarm font-medium';
+                } else if (warningRacks > 0) {
+                    statusElement.textContent = 'Warning: ' + warningRacks + ' rack(s) >73°F - Monitor temperature trends';
+                    statusElement.className = 'text-xs fill-power font-medium';
+                } else {
+                    statusElement.textContent = 'Normal Operation - All Equipment Online';
+                    statusElement.className = 'text-xs fill-cooling font-medium';
+                }
+            }
+        }
+        
+        // Add interactive click handlers for floorplan
+        function initFloorplanInteractivity() {
+            // Add click handlers for racks
+            document.querySelectorAll('.rack').forEach(rack => {
+                rack.style.cursor = 'pointer';
+                rack.addEventListener('click', function() {
+                    const rackId = this.getAttribute('data-rack');
+                    const temp = this.getAttribute('data-temp');
+                    alert('Rack ' + rackId + '\\nInlet Temperature: ' + temp + '°F\\nStatus: Normal\\nIT Load: 4.2 kW');
+                });
+            });
+            
+            // Add click handlers for CRAC units
+            document.querySelectorAll('.crac-unit').forEach(crac => {
+                crac.style.cursor = 'pointer';
+                crac.addEventListener('click', function() {
+                    const cracId = this.getAttribute('data-crac');
+                    const role = this.querySelector('text:nth-child(4)').textContent;
+                    alert(cracId + '\\nRole: ' + role + '\\nStatus: Running\\nOutput: 65%\\nSupply Temp: 55°F');
+                });
+            });
+        }
+        
         // Simulate live data updates
         function updateLiveData() {
             const now = Date.now();
@@ -745,6 +875,9 @@ app.get('/ui', (req, res) => {
             if (tempData.length > maxDataPoints) tempData.shift();
             if (energyData.length > maxDataPoints) energyData.shift();
             
+            // Update floorplan
+            updateFloorplan(temp, setpoint, lead_pct, lag_on, power, cooling, cop);
+            
             // Update charts
             drawTemperatureChart();
             drawEnergyChart();
@@ -759,6 +892,7 @@ app.get('/ui', (req, res) => {
         // Initialize on load
         window.addEventListener('load', function() {
             initCharts();
+            initFloorplanInteractivity();
             updateLiveData();
             setInterval(updateLiveData, 500);
         });
@@ -800,6 +934,179 @@ app.get('/ui', (req, res) => {
                 <div class="text-sm font-medium text-muted-foreground">Active Alarms</div>
                 <div class="text-3xl font-bold text-alarm" id="kpi-alarms">0</div>
                 <div class="text-xs text-muted-foreground mt-1">All systems normal</div>
+            </div>
+        </div>
+
+        <!-- Data Center Floorplan Section -->
+        <div class="mb-8">
+            <div class="mb-4">
+                <h2 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+                    🏢 Data Center Floorplan
+                </h2>
+                <p class="text-muted-foreground">Live system mimic with real-time temperature monitoring and equipment status</p>
+            </div>
+            
+            <div class="bg-card text-card-foreground rounded-lg border shadow-sm p-6">
+                <div class="w-full h-96 bg-muted rounded-md overflow-hidden" id="floorplan-container">
+                    <svg width="100%" height="100%" viewBox="0 0 800 400" id="floorplan-svg" class="w-full h-full">
+                        <!-- Room Outline -->
+                        <rect x="10" y="10" width="780" height="380" fill="#f8f9fa" stroke="#34495e" stroke-width="3" rx="5"/>
+                        
+                        <!-- Room Label -->
+                        <text x="400" y="35" text-anchor="middle" class="text-sm font-bold fill-foreground">Data Center Room - Zone A</text>
+                        
+                        <!-- Cold Aisle (Blue) -->
+                        <rect x="50" y="60" width="700" height="80" fill="#dbeafe" stroke="#3b82f6" stroke-width="2" stroke-dasharray="5,5" rx="4"/>
+                        <text x="400" y="105" text-anchor="middle" class="text-xs font-medium fill-blue-600">COLD AISLE - Supply Air 55°F</text>
+                        
+                        <!-- Hot Aisle (Red) -->
+                        <rect x="50" y="260" width="700" height="80" fill="#fef2f2" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,5" rx="4"/>
+                        <text x="400" y="305" text-anchor="middle" class="text-xs font-medium fill-red-600">HOT AISLE - Return Air 75°F</text>
+                        
+                        <!-- Server Racks Row 1 (facing cold aisle) -->
+                        <g id="rack-row-1">
+                            <!-- Rack A1 -->
+                            <rect x="80" y="150" width="40" height="100" fill="#2d3748" stroke="#4a5568" stroke-width="2" rx="3" class="rack" data-rack="A1" data-temp="71.8"/>
+                            <text x="100" y="170" text-anchor="middle" class="text-xs fill-white font-medium">A1</text>
+                            <circle cx="100" cy="185" r="4" class="temp-sensor" fill="#10b981" data-temp="71.8"/>
+                            <text x="100" y="189" text-anchor="middle" class="text-xs fill-white">72°</text>
+                            
+                            <!-- Rack A2 -->
+                            <rect x="140" y="150" width="40" height="100" fill="#2d3748" stroke="#4a5568" stroke-width="2" rx="3" class="rack" data-rack="A2" data-temp="72.1"/>
+                            <text x="160" y="170" text-anchor="middle" class="text-xs fill-white font-medium">A2</text>
+                            <circle cx="160" cy="185" r="4" class="temp-sensor" fill="#10b981" data-temp="72.1"/>
+                            <text x="160" y="189" text-anchor="middle" class="text-xs fill-white">72°</text>
+                            
+                            <!-- Rack A3 -->
+                            <rect x="200" y="150" width="40" height="100" fill="#2d3748" stroke="#4a5568" stroke-width="2" rx="3" class="rack" data-rack="A3" data-temp="71.9"/>
+                            <text x="220" y="170" text-anchor="middle" class="text-xs fill-white font-medium">A3</text>
+                            <circle cx="220" cy="185" r="4" class="temp-sensor" fill="#10b981" data-temp="71.9"/>
+                            <text x="220" y="189" text-anchor="middle" class="text-xs fill-white">72°</text>
+                            
+                            <!-- Rack A4 -->
+                            <rect x="260" y="150" width="40" height="100" fill="#2d3748" stroke="#4a5568" stroke-width="2" rx="3" class="rack" data-rack="A4" data-temp="72.3"/>
+                            <text x="280" y="170" text-anchor="middle" class="text-xs fill-white font-medium">A4</text>
+                            <circle cx="280" cy="185" r="4" class="temp-sensor" fill="#f59e0b" data-temp="72.3"/>
+                            <text x="280" y="189" text-anchor="middle" class="text-xs fill-white">72°</text>
+                            
+                            <!-- Rack A5 -->
+                            <rect x="320" y="150" width="40" height="100" fill="#2d3748" stroke="#4a5568" stroke-width="2" rx="3" class="rack" data-rack="A5" data-temp="72.0"/>
+                            <text x="340" y="170" text-anchor="middle" class="text-xs fill-white font-medium">A5</text>
+                            <circle cx="340" cy="185" r="4" class="temp-sensor" fill="#10b981" data-temp="72.0"/>
+                            <text x="340" y="189" text-anchor="middle" class="text-xs fill-white">72°</text>
+                            
+                            <!-- Rack A6 -->
+                            <rect x="380" y="150" width="40" height="100" fill="#2d3748" stroke="#4a5568" stroke-width="2" rx="3" class="rack" data-rack="A6" data-temp="71.7"/>
+                            <text x="400" y="170" text-anchor="middle" class="text-xs fill-white font-medium">A6</text>
+                            <circle cx="400" cy="185" r="4" class="temp-sensor" fill="#10b981" data-temp="71.7"/>
+                            <text x="400" y="189" text-anchor="middle" class="text-xs fill-white">72°</text>
+                            
+                            <!-- Rack A7 -->
+                            <rect x="440" y="150" width="40" height="100" fill="#2d3748" stroke="#4a5568" stroke-width="2" rx="3" class="rack" data-rack="A7" data-temp="72.2"/>
+                            <text x="460" y="170" text-anchor="middle" class="text-xs fill-white font-medium">A7</text>
+                            <circle cx="460" cy="185" r="4" class="temp-sensor" fill="#10b981" data-temp="72.2"/>
+                            <text x="460" y="189" text-anchor="middle" class="text-xs fill-white">72°</text>
+                            
+                            <!-- Rack A8 -->
+                            <rect x="500" y="150" width="40" height="100" fill="#2d3748" stroke="#4a5568" stroke-width="2" rx="3" class="rack" data-rack="A8" data-temp="71.6"/>
+                            <text x="520" y="170" text-anchor="middle" class="text-xs fill-white font-medium">A8</text>
+                            <circle cx="520" cy="185" r="4" class="temp-sensor" fill="#10b981" data-temp="71.6"/>
+                            <text x="520" y="189" text-anchor="middle" class="text-xs fill-white">72°</text>
+                            
+                            <!-- Rack A9 -->
+                            <rect x="560" y="150" width="40" height="100" fill="#2d3748" stroke="#4a5568" stroke-width="2" rx="3" class="rack" data-rack="A9" data-temp="72.4"/>
+                            <text x="580" y="170" text-anchor="middle" class="text-xs fill-white font-medium">A9</text>
+                            <circle cx="580" cy="185" r="4" class="temp-sensor" fill="#f59e0b" data-temp="72.4"/>
+                            <text x="580" y="189" text-anchor="middle" class="text-xs fill-white">72°</text>
+                            
+                            <!-- Rack A10 -->
+                            <rect x="620" y="150" width="40" height="100" fill="#2d3748" stroke="#4a5568" stroke-width="2" rx="3" class="rack" data-rack="A10" data-temp="71.8"/>
+                            <text x="640" y="170" text-anchor="middle" class="text-xs fill-white font-medium">A10</text>
+                            <circle cx="640" cy="185" r="4" class="temp-sensor" fill="#10b981" data-temp="71.8"/>
+                            <text x="640" y="189" text-anchor="middle" class="text-xs fill-white">72°</text>
+                            
+                            <!-- Rack A11 -->
+                            <rect x="680" y="150" width="40" height="100" fill="#2d3748" stroke="#4a5568" stroke-width="2" rx="3" class="rack" data-rack="A11" data-temp="72.1"/>
+                            <text x="700" y="170" text-anchor="middle" class="text-xs fill-white font-medium">A11</text>
+                            <circle cx="700" cy="185" r="4" class="temp-sensor" fill="#10b981" data-temp="72.1"/>
+                            <text x="700" y="189" text-anchor="middle" class="text-xs fill-white">72°</text>
+                        </g>
+                        
+                        <!-- CRAC Units -->
+                        <!-- CRAC-01 (Left) -->
+                        <g id="crac-01" class="crac-unit" data-crac="CRAC-01">
+                            <rect x="20" y="160" width="50" height="80" fill="#27ae60" stroke="#1e8449" stroke-width="3" rx="5"/>
+                            <text x="45" y="185" text-anchor="middle" class="text-xs fill-white font-bold">CRAC</text>
+                            <text x="45" y="200" text-anchor="middle" class="text-xs fill-white font-bold">01</text>
+                            <text x="45" y="215" text-anchor="middle" class="text-xs fill-white">LEAD</text>
+                            <circle cx="45" cy="225" r="6" fill="#a3f7a3" class="status-indicator">
+                                <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                            <!-- Airflow arrows -->
+                            <path d="M 70 180 L 80 180 M 75 175 L 80 180 L 75 185" stroke="#ffffff" stroke-width="2" fill="none"/>
+                            <path d="M 70 200 L 80 200 M 75 195 L 80 200 L 75 205" stroke="#ffffff" stroke-width="2" fill="none"/>
+                            <path d="M 70 220 L 80 220 M 75 215 L 80 220 L 75 225" stroke="#ffffff" stroke-width="2" fill="none"/>
+                        </g>
+                        
+                        <!-- CRAC-02 (Center) -->
+                        <g id="crac-02" class="crac-unit" data-crac="CRAC-02">
+                            <rect x="375" y="350" width="50" height="40" fill="#3498db" stroke="#2980b9" stroke-width="3" rx="5"/>
+                            <text x="400" y="368" text-anchor="middle" class="text-xs fill-white font-bold">CRAC-02</text>
+                            <text x="400" y="380" text-anchor="middle" class="text-xs fill-white">LAG</text>
+                            <circle cx="385" cy="385" r="4" fill="#5dade2"/>
+                            <!-- Airflow arrows -->
+                            <path d="M 390 340 L 390 350 M 385 345 L 390 350 L 395 345" stroke="#3498db" stroke-width="2" fill="none"/>
+                            <path d="M 400 340 L 400 350 M 395 345 L 400 350 L 405 345" stroke="#3498db" stroke-width="2" fill="none"/>
+                            <path d="M 410 340 L 410 350 M 405 345 L 410 350 L 415 345" stroke="#3498db" stroke-width="2" fill="none"/>
+                        </g>
+                        
+                        <!-- CRAC-03 (Right) -->
+                        <g id="crac-03" class="crac-unit" data-crac="CRAC-03">
+                            <rect x="730" y="160" width="50" height="80" fill="#95a5a6" stroke="#7f8c8d" stroke-width="3" rx="5"/>
+                            <text x="755" y="185" text-anchor="middle" class="text-xs fill-white font-bold">CRAC</text>
+                            <text x="755" y="200" text-anchor="middle" class="text-xs fill-white font-bold">03</text>
+                            <text x="755" y="215" text-anchor="middle" class="text-xs fill-white">STANDBY</text>
+                            <circle cx="755" cy="225" r="6" fill="#bdc3c7" class="status-indicator"/>
+                        </g>
+                        
+                        <!-- Temperature Legend -->
+                        <g id="temp-legend" transform="translate(620, 50)">
+                            <rect x="0" y="0" width="160" height="90" fill="rgba(255,255,255,0.9)" stroke="#34495e" stroke-width="1" rx="3"/>
+                            <text x="80" y="15" text-anchor="middle" class="text-xs font-bold fill-foreground">Temperature Status</text>
+                            
+                            <circle cx="15" cy="30" r="6" fill="#10b981"/>
+                            <text x="25" y="35" class="text-xs fill-foreground">Normal (70-73°F)</text>
+                            
+                            <circle cx="15" cy="50" r="6" fill="#f59e0b"/>
+                            <text x="25" y="55" class="text-xs fill-foreground">Warning (73-75°F)</text>
+                            
+                            <circle cx="15" cy="70" r="6" fill="#ef4444"/>
+                            <text x="25" y="75" class="text-xs fill-foreground">Critical (>75°F)</text>
+                        </g>
+                        
+                        <!-- System Status -->
+                        <g id="system-status" transform="translate(50, 350)">
+                            <rect x="0" y="0" width="280" height="35" fill="rgba(255,255,255,0.9)" stroke="#34495e" stroke-width="1" rx="3"/>
+                            <text x="10" y="15" class="text-xs font-bold fill-foreground">System Status:</text>
+                            <text x="10" y="28" class="text-xs fill-cooling font-medium" id="floorplan-status">Normal Operation - All Equipment Online</text>
+                        </g>
+                    </svg>
+                </div>
+                
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-cooling" id="floorplan-avg-temp">72.0°F</div>
+                        <div class="text-sm text-muted-foreground">Average Rack Inlet</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-setpoint" id="floorplan-airflow">24,000 CFM</div>
+                        <div class="text-sm text-muted-foreground">Total Airflow</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-primary" id="floorplan-load">85%</div>
+                        <div class="text-sm text-muted-foreground">IT Load Utilization</div>
+                    </div>
+                </div>
             </div>
         </div>
 

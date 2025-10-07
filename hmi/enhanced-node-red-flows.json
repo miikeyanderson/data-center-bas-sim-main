@@ -1,0 +1,629 @@
+[
+    {
+        "id": "f7c23e1a.b3c8a",
+        "type": "tab",
+        "label": "Data Center BAS Professional HMI",
+        "disabled": false,
+        "info": "Professional Data Center Building Automation System HMI\n\nEnhanced Features:\n- Interactive mimic diagram with floor layout\n- Real-time airflow visualization\n- Advanced fault injection controls\n- Individual role override capabilities\n- Professional styling and branding\n- Comprehensive system monitoring"
+    },
+    {
+        "id": "ui_base",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-custom",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "customTheme": {
+                "name": "Professional BAS Theme",
+                "default": "#004B87",
+                "baseColor": "#004B87",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#004B87",
+                    "value": "#004B87",
+                    "edited": true
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#004B87",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#f5f5f5",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#1f2937",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#d1d5db",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey"
+            }
+        },
+        "site": {
+            "name": "Data Center BAS Control System",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "header_group",
+        "type": "ui_group",
+        "name": "System Header",
+        "tab": "f7c23e1a.b3c8a",
+        "order": 1,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": "header-group"
+    },
+    {
+        "id": "mimic_group",
+        "type": "ui_group",
+        "name": "Data Center Floor Plan",
+        "tab": "f7c23e1a.b3c8a",
+        "order": 2,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": "mimic-group"
+    },
+    {
+        "id": "1a2b3c4d.e5f6g7",
+        "type": "ui_group",
+        "name": "Zone Temperature",
+        "tab": "f7c23e1a.b3c8a",
+        "order": 3,
+        "disp": true,
+        "width": "4",
+        "collapse": false,
+        "className": "temperature-group"
+    },
+    {
+        "id": "2b3c4d5e.f6g7h8",
+        "type": "ui_group",
+        "name": "CRAC Unit Status",
+        "tab": "f7c23e1a.b3c8a",
+        "order": 4,
+        "disp": true,
+        "width": "8",
+        "collapse": false,
+        "className": "crac-group"
+    },
+    {
+        "id": "4d5e6f7g.h8i9j0",
+        "type": "ui_group",
+        "name": "System Controls",
+        "tab": "f7c23e1a.b3c8a",
+        "order": 5,
+        "disp": true,
+        "width": "4",
+        "collapse": false,
+        "className": "controls-group"
+    },
+    {
+        "id": "fault_injection_group",
+        "type": "ui_group",
+        "name": "Advanced Fault Injection",
+        "tab": "f7c23e1a.b3c8a",
+        "order": 6,
+        "disp": true,
+        "width": "4",
+        "collapse": false,
+        "className": "fault-group"
+    },
+    {
+        "id": "role_override_group",
+        "type": "ui_group",
+        "name": "Role Override Controls",
+        "tab": "f7c23e1a.b3c8a",
+        "order": 7,
+        "disp": true,
+        "width": "4",
+        "collapse": false,
+        "className": "role-group"
+    },
+    {
+        "id": "3c4d5e6f.g7h8i9",
+        "type": "ui_group",
+        "name": "Active Alarms",
+        "tab": "f7c23e1a.b3c8a",
+        "order": 8,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": "alarm-group"
+    },
+    {
+        "id": "5e6f7g8h.i9j0k1",
+        "type": "ui_group",
+        "name": "Performance Trends",
+        "tab": "f7c23e1a.b3c8a",
+        "order": 9,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": "trends-group"
+    },
+    {
+        "id": "header_display",
+        "type": "ui_template",
+        "z": "f7c23e1a.b3c8a",
+        "group": "header_group",
+        "name": "Professional Header",
+        "order": 1,
+        "width": "12",
+        "height": "2",
+        "format": "<div class=\"professional-header\">\n    <div class=\"header-content\">\n        <div class=\"logo-section\">\n            <div class=\"company-logo\">🏢</div>\n            <div class=\"system-title\">\n                <h1>Data Center BAS Control System</h1>\n                <p>Mission-Critical Cooling Management Platform</p>\n            </div>\n        </div>\n        <div class=\"status-indicators\">\n            <div class=\"indicator\" ng-class=\"{'online': msg.payload.system_online, 'offline': !msg.payload.system_online}\">\n                <span class=\"status-light\"></span>\n                <span>{{msg.payload.system_online ? 'SYSTEM ONLINE' : 'SYSTEM OFFLINE'}}</span>\n            </div>\n            <div class=\"timestamp\">{{new Date().toLocaleString()}}</div>\n        </div>\n    </div>\n</div>\n\n<style>\n.professional-header {\n    background: linear-gradient(135deg, #004B87 0%, #0056A3 100%);\n    color: white;\n    padding: 15px 20px;\n    border-radius: 8px;\n    box-shadow: 0 4px 12px rgba(0,0,0,0.1);\n    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;\n}\n\n.header-content {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n.logo-section {\n    display: flex;\n    align-items: center;\n    gap: 15px;\n}\n\n.company-logo {\n    font-size: 32px;\n    background: rgba(255,255,255,0.1);\n    padding: 10px;\n    border-radius: 8px;\n}\n\n.system-title h1 {\n    margin: 0;\n    font-size: 24px;\n    font-weight: 600;\n    color: white;\n}\n\n.system-title p {\n    margin: 5px 0 0 0;\n    font-size: 14px;\n    color: rgba(255,255,255,0.8);\n}\n\n.status-indicators {\n    display: flex;\n    flex-direction: column;\n    align-items: flex-end;\n    gap: 8px;\n}\n\n.indicator {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    font-weight: 500;\n}\n\n.status-light {\n    width: 12px;\n    height: 12px;\n    border-radius: 50%;\n    background: #dc3545;\n    box-shadow: 0 0 8px rgba(220,53,69,0.5);\n    animation: pulse 2s infinite;\n}\n\n.indicator.online .status-light {\n    background: #28a745;\n    box-shadow: 0 0 8px rgba(40,167,69,0.5);\n}\n\n.timestamp {\n    font-size: 12px;\n    color: rgba(255,255,255,0.7);\n    font-family: monospace;\n}\n\n@keyframes pulse {\n    0% { transform: scale(1); }\n    50% { transform: scale(1.1); }\n    100% { transform: scale(1); }\n}\n</style>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 200,
+        "y": 60,
+        "wires": [[]]
+    },
+    {
+        "id": "mimic_diagram",
+        "type": "ui_template",
+        "z": "f7c23e1a.b3c8a",
+        "group": "mimic_group",
+        "name": "Data Center Mimic Diagram",
+        "order": 1,
+        "width": "12",
+        "height": "8",
+        "format": "<div class=\"mimic-container\">\n    <div class=\"floor-plan\">\n        <!-- Data Center Floor Layout -->\n        <svg viewBox=\"0 0 800 400\" class=\"floor-svg\">\n            <!-- Room Outline -->\n            <rect x=\"50\" y=\"50\" width=\"700\" height=\"300\" fill=\"#f8f9fa\" stroke=\"#343a40\" stroke-width=\"3\" rx=\"10\"/>\n            \n            <!-- Hot Aisle -->\n            <rect x=\"200\" y=\"100\" width=\"400\" height=\"80\" fill=\"#ffebee\" stroke=\"#e57373\" stroke-width=\"2\" opacity=\"0.7\"/>\n            <text x=\"400\" y=\"145\" text-anchor=\"middle\" class=\"aisle-label\">HOT AISLE</text>\n            \n            <!-- Cold Aisle -->\n            <rect x=\"200\" y=\"220\" width=\"400\" height=\"80\" fill=\"#e3f2fd\" stroke=\"#64b5f6\" stroke-width=\"2\" opacity=\"0.7\"/>\n            <text x=\"400\" y=\"265\" text-anchor=\"middle\" class=\"aisle-label\">COLD AISLE</text>\n            \n            <!-- Server Racks -->\n            <g class=\"server-racks\">\n                <rect x=\"220\" y=\"190\" width=\"15\" height=\"20\" fill=\"#6c757d\" class=\"rack\"/>\n                <rect x=\"250\" y=\"190\" width=\"15\" height=\"20\" fill=\"#6c757d\" class=\"rack\"/>\n                <rect x=\"280\" y=\"190\" width=\"15\" height=\"20\" fill=\"#6c757d\" class=\"rack\"/>\n                <rect x=\"310\" y=\"190\" width=\"15\" height=\"20\" fill=\"#6c757d\" class=\"rack\"/>\n                <rect x=\"340\" y=\"190\" width=\"15\" height=\"20\" fill=\"#6c757d\" class=\"rack\"/>\n                <rect x=\"370\" y=\"190\" width=\"15\" height=\"20\" fill=\"#6c757d\" class=\"rack\"/>\n                <rect x=\"400\" y=\"190\" width=\"15\" height=\"20\" fill=\"#6c757d\" class=\"rack\"/>\n                <rect x=\"430\" y=\"190\" width=\"15\" height=\"20\" fill=\"#6c757d\" class=\"rack\"/>\n                <rect x=\"460\" y=\"190\" width=\"15\" height=\"20\" fill=\"#6c757d\" class=\"rack\"/>\n                <rect x=\"490\" y=\"190\" width=\"15\" height=\"20\" fill=\"#6c757d\" class=\"rack\"/>\n                <rect x=\"520\" y=\"190\" width=\"15\" height=\"20\" fill=\"#6c757d\" class=\"rack\"/>\n                <rect x=\"550\" y=\"190\" width=\"15\" height=\"20\" fill=\"#6c757d\" class=\"rack\"/>\n            </g>\n            \n            <!-- CRAC Units -->\n            <g class=\"crac-units\">\n                <!-- CRAC-01 (Lead) -->\n                <g id=\"crac-01\" ng-class=\"getCracClass('CRAC-01')\">\n                    <rect x=\"80\" y=\"160\" width=\"60\" height=\"80\" rx=\"5\" class=\"crac-unit\"/>\n                    <text x=\"110\" y=\"180\" text-anchor=\"middle\" class=\"crac-label\">CRAC-01</text>\n                    <text x=\"110\" y=\"195\" text-anchor=\"middle\" class=\"crac-role\">{{getCracRole('CRAC-01')}}</text>\n                    <text x=\"110\" y=\"210\" text-anchor=\"middle\" class=\"crac-status\">{{getCracStatus('CRAC-01')}}</text>\n                    <text x=\"110\" y=\"225\" text-anchor=\"middle\" class=\"crac-power\">{{getCracPower('CRAC-01')}} kW</text>\n                    \n                    <!-- Temperature Zone -->\n                    <circle cx=\"110\" cy=\"140\" r=\"20\" class=\"temp-zone\" ng-style=\"getTempZoneStyle('CRAC-01')\"/>\n                    <text x=\"110\" y=\"145\" text-anchor=\"middle\" class=\"temp-value\">{{getZoneTemp('CRAC-01')}}°C</text>\n                </g>\n                \n                <!-- CRAC-02 (Lag) -->\n                <g id=\"crac-02\" ng-class=\"getCracClass('CRAC-02')\">\n                    <rect x=\"370\" y=\"80\" width=\"60\" height=\"60\" rx=\"5\" class=\"crac-unit\"/>\n                    <text x=\"400\" y=\"100\" text-anchor=\"middle\" class=\"crac-label\">CRAC-02</text>\n                    <text x=\"400\" y=\"115\" text-anchor=\"middle\" class=\"crac-role\">{{getCracRole('CRAC-02')}}</text>\n                    <text x=\"400\" y=\"130\" text-anchor=\"middle\" class=\"crac-status\">{{getCracStatus('CRAC-02')}}</text>\n                    \n                    <!-- Temperature Zone -->\n                    <circle cx=\"400\" cy=\"60\" r=\"15\" class=\"temp-zone\" ng-style=\"getTempZoneStyle('CRAC-02')\"/>\n                    <text x=\"400\" y=\"65\" text-anchor=\"middle\" class=\"temp-value\">{{getZoneTemp('CRAC-02')}}°C</text>\n                </g>\n                \n                <!-- CRAC-03 (Standby) -->\n                <g id=\"crac-03\" ng-class=\"getCracClass('CRAC-03')\">\n                    <rect x=\"660\" y=\"160\" width=\"60\" height=\"80\" rx=\"5\" class=\"crac-unit\"/>\n                    <text x=\"690\" y=\"180\" text-anchor=\"middle\" class=\"crac-label\">CRAC-03</text>\n                    <text x=\"690\" y=\"195\" text-anchor=\"middle\" class=\"crac-role\">{{getCracRole('CRAC-03')}}</text>\n                    <text x=\"690\" y=\"210\" text-anchor=\"middle\" class=\"crac-status\">{{getCracStatus('CRAC-03')}}</text>\n                    <text x=\"690\" y=\"225\" text-anchor=\"middle\" class=\"crac-power\">{{getCracPower('CRAC-03')}} kW</text>\n                    \n                    <!-- Temperature Zone -->\n                    <circle cx=\"690\" cy=\"140\" r=\"20\" class=\"temp-zone\" ng-style=\"getTempZoneStyle('CRAC-03')\"/>\n                    <text x=\"690\" y=\"145\" text-anchor=\"middle\" class=\"temp-value\">{{getZoneTemp('CRAC-03')}}°C</text>\n                </g>\n            </g>\n            \n            <!-- Airflow Arrows -->\n            <g class=\"airflow-arrows\">\n                <!-- CRAC-01 Airflow -->\n                <g ng-show=\"getCracStatus('CRAC-01') === 'running'\">\n                    <path d=\"M 140 200 L 200 200\" stroke=\"#007bff\" stroke-width=\"3\" marker-end=\"url(#arrowhead)\" class=\"airflow-arrow\"/>\n                    <path d=\"M 140 210 L 200 210\" stroke=\"#007bff\" stroke-width=\"2\" marker-end=\"url(#arrowhead)\" class=\"airflow-arrow\"/>\n                    <path d=\"M 140 190 L 200 190\" stroke=\"#007bff\" stroke-width=\"2\" marker-end=\"url(#arrowhead)\" class=\"airflow-arrow\"/>\n                </g>\n                \n                <!-- CRAC-02 Airflow -->\n                <g ng-show=\"getCracStatus('CRAC-02') === 'running'\">\n                    <path d=\"M 400 140 L 400 180\" stroke=\"#007bff\" stroke-width=\"3\" marker-end=\"url(#arrowhead)\" class=\"airflow-arrow\"/>\n                    <path d=\"M 390 140 L 390 180\" stroke=\"#007bff\" stroke-width=\"2\" marker-end=\"url(#arrowhead)\" class=\"airflow-arrow\"/>\n                    <path d=\"M 410 140 L 410 180\" stroke=\"#007bff\" stroke-width=\"2\" marker-end=\"url(#arrowhead)\" class=\"airflow-arrow\"/>\n                </g>\n                \n                <!-- CRAC-03 Airflow -->\n                <g ng-show=\"getCracStatus('CRAC-03') === 'running'\">\n                    <path d=\"M 660 200 L 600 200\" stroke=\"#007bff\" stroke-width=\"3\" marker-end=\"url(#arrowhead)\" class=\"airflow-arrow\"/>\n                    <path d=\"M 660 210 L 600 210\" stroke=\"#007bff\" stroke-width=\"2\" marker-end=\"url(#arrowhead)\" class=\"airflow-arrow\"/>\n                    <path d=\"M 660 190 L 600 190\" stroke=\"#007bff\" stroke-width=\"2\" marker-end=\"url(#arrowhead)\" class=\"airflow-arrow\"/>\n                </g>\n            </g>\n            \n            <!-- Arrow Marker Definition -->\n            <defs>\n                <marker id=\"arrowhead\" markerWidth=\"10\" markerHeight=\"7\" refX=\"9\" refY=\"3.5\" orient=\"auto\">\n                    <polygon points=\"0 0, 10 3.5, 0 7\" fill=\"#007bff\"/>\n                </marker>\n            </defs>\n            \n            <!-- Temperature Legend -->\n            <g class=\"temp-legend\">\n                <rect x=\"580\" y=\"320\" width=\"150\" height=\"60\" fill=\"white\" stroke=\"#dee2e6\" rx=\"5\"/>\n                <text x=\"590\" y=\"335\" class=\"legend-title\">Temperature Zones</text>\n                <circle cx=\"595\" cy=\"345\" r=\"5\" fill=\"#4a90e2\"/>\n                <text x=\"610\" y=\"350\" class=\"legend-text\">Normal (20-24°C)</text>\n                <circle cx=\"595\" cy=\"360\" r=\"5\" fill=\"#f5a623\"/>\n                <text x=\"610\" y=\"365\" class=\"legend-text\">Warning (24-27°C)</text>\n                <circle cx=\"595\" cy=\"375\" r=\"5\" fill=\"#d0021b\"/>\n                <text x=\"610\" y=\"380\" class=\"legend-text\">Critical (>27°C)</text>\n            </g>\n        </svg>\n    </div>\n</div>\n\n<style>\n.mimic-container {\n    background: white;\n    border-radius: 8px;\n    box-shadow: 0 2px 8px rgba(0,0,0,0.1);\n    padding: 15px;\n    margin: 10px 0;\n}\n\n.floor-svg {\n    width: 100%;\n    height: 400px;\n    border: 1px solid #dee2e6;\n    border-radius: 4px;\n    background: #f8f9fa;\n}\n\n.aisle-label {\n    font-size: 14px;\n    font-weight: bold;\n    fill: #495057;\n}\n\n.crac-unit {\n    fill: #e9ecef;\n    stroke: #6c757d;\n    stroke-width: 2;\n    transition: all 0.3s;\n}\n\n.crac-running .crac-unit {\n    fill: #d4edda;\n    stroke: #28a745;\n}\n\n.crac-failed .crac-unit {\n    fill: #f8d7da;\n    stroke: #dc3545;\n}\n\n.crac-starting .crac-unit {\n    fill: #fff3cd;\n    stroke: #ffc107;\n}\n\n.crac-label {\n    font-size: 12px;\n    font-weight: bold;\n    fill: #495057;\n}\n\n.crac-role {\n    font-size: 10px;\n    font-weight: normal;\n    fill: #6c757d;\n}\n\n.crac-status {\n    font-size: 10px;\n    font-weight: bold;\n    fill: #495057;\n}\n\n.crac-power {\n    font-size: 9px;\n    fill: #6c757d;\n}\n\n.temp-zone {\n    fill-opacity: 0.7;\n    stroke-width: 2;\n    stroke-opacity: 0.9;\n}\n\n.temp-value {\n    font-size: 10px;\n    font-weight: bold;\n    fill: white;\n    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);\n}\n\n.airflow-arrow {\n    animation: flow 2s linear infinite;\n    opacity: 0.8;\n}\n\n.rack {\n    transition: fill 0.3s;\n}\n\n.rack:hover {\n    fill: #495057;\n}\n\n.legend-title {\n    font-size: 12px;\n    font-weight: bold;\n    fill: #495057;\n}\n\n.legend-text {\n    font-size: 10px;\n    fill: #6c757d;\n}\n\n@keyframes flow {\n    0% { stroke-dasharray: 0 10; }\n    100% { stroke-dasharray: 10 0; }\n}\n</style>\n\n<script>\n(function(scope) {\n    // Mock data - in real implementation, this comes from msg.payload\n    scope.cracData = {\n        'CRAC-01': { role: 'LEAD', status: 'running', power: 25.5 },\n        'CRAC-02': { role: 'LAG', status: 'starting', power: 12.1 },\n        'CRAC-03': { role: 'STANDBY', status: 'off', power: 0.0 }\n    };\n    \n    scope.zoneTemp = 22.1;\n    \n    scope.getCracClass = function(unitId) {\n        const status = scope.cracData[unitId]?.status || 'off';\n        return 'crac-' + status;\n    };\n    \n    scope.getCracRole = function(unitId) {\n        return scope.cracData[unitId]?.role || 'UNKNOWN';\n    };\n    \n    scope.getCracStatus = function(unitId) {\n        return scope.cracData[unitId]?.status || 'off';\n    };\n    \n    scope.getCracPower = function(unitId) {\n        return (scope.cracData[unitId]?.power || 0).toFixed(1);\n    };\n    \n    scope.getZoneTemp = function(unitId) {\n        return scope.zoneTemp.toFixed(1);\n    };\n    \n    scope.getTempZoneStyle = function(unitId) {\n        const temp = scope.zoneTemp;\n        let color, stroke;\n        \n        if (temp <= 24) {\n            color = '#4a90e2';  // Blue - Normal\n            stroke = '#357abd';\n        } else if (temp <= 27) {\n            color = '#f5a623';  // Orange - Warning\n            stroke = '#e8931e';\n        } else {\n            color = '#d0021b';  // Red - Critical\n            stroke = '#b30219';\n        }\n        \n        return {\n            fill: color,\n            stroke: stroke\n        };\n    };\n})(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 250,
+        "y": 160,
+        "wires": [[]]
+    },
+    {
+        "id": "advanced_fault_injection",
+        "type": "ui_template",
+        "z": "f7c23e1a.b3c8a",
+        "group": "fault_injection_group",
+        "name": "Advanced Fault Controls",
+        "order": 1,
+        "width": "4",
+        "height": "6",
+        "format": "<div class=\"fault-injection-panel\">\n    <h4>Fault Injection Controls</h4>\n    \n    <!-- Sensor Faults -->\n    <div class=\"fault-section\">\n        <h5>Sensor Faults</h5>\n        <div class=\"fault-controls\">\n            <button class=\"fault-btn\" ng-click=\"injectFault('sensor', 'drift')\" ng-class=\"{'active': activeFaults.sensor_drift}\">\n                Temperature Drift\n            </button>\n            <button class=\"fault-btn\" ng-click=\"injectFault('sensor', 'bias')\" ng-class=\"{'active': activeFaults.sensor_bias}\">\n                Sensor Bias\n            </button>\n            <button class=\"fault-btn\" ng-click=\"injectFault('sensor', 'stuck')\" ng-class=\"{'active': activeFaults.sensor_stuck}\">\n                Stuck Reading\n            </button>\n            <button class=\"fault-btn\" ng-click=\"injectFault('sensor', 'noise')\" ng-class=\"{'active': activeFaults.sensor_noise}\">\n                Signal Noise\n            </button>\n        </div>\n    </div>\n    \n    <!-- Actuator Faults -->\n    <div class=\"fault-section\">\n        <h5>Actuator Faults</h5>\n        <div class=\"fault-controls\">\n            <button class=\"fault-btn\" ng-click=\"injectFault('actuator', 'stiction')\" ng-class=\"{'active': activeFaults.actuator_stiction}\">\n                Valve Stiction\n            </button>\n            <button class=\"fault-btn\" ng-click=\"injectFault('actuator', 'backlash')\" ng-class=\"{'active': activeFaults.actuator_backlash}\">\n                Backlash\n            </button>\n            <button class=\"fault-btn\" ng-click=\"injectFault('actuator', 'oscillation')\" ng-class=\"{'active': activeFaults.actuator_oscillation}\">\n                Oscillation\n            </button>\n            <button class=\"fault-btn\" ng-click=\"injectFault('actuator', 'degradation')\" ng-class=\"{'active': activeFaults.actuator_degradation}\">\n                Performance Loss\n            </button>\n        </div>\n    </div>\n    \n    <!-- Control System Faults -->\n    <div class=\"fault-section\">\n        <h5>Control Faults</h5>\n        <div class=\"fault-controls\">\n            <button class=\"fault-btn\" ng-click=\"injectFault('control', 'short_cycle')\" ng-class=\"{'active': activeFaults.control_short_cycle}\">\n                Short Cycling\n            </button>\n            <button class=\"fault-btn\" ng-click=\"injectFault('control', 'instability')\" ng-class=\"{'active': activeFaults.control_instability}\">\n                PID Instability\n            </button>\n            <button class=\"fault-btn\" ng-click=\"injectFault('control', 'saturation')\" ng-class=\"{'active': activeFaults.control_saturation}\">\n                Windup\n            </button>\n            <button class=\"fault-btn\" ng-click=\"injectFault('control', 'communication')\" ng-class=\"{'active': activeFaults.control_communication}\">\n                Comm Loss\n            </button>\n        </div>\n    </div>\n    \n    <!-- Clear All Faults -->\n    <div class=\"fault-section\">\n        <button class=\"clear-all-btn\" ng-click=\"clearAllFaults()\">\n            Clear All Faults\n        </button>\n    </div>\n</div>\n\n<style>\n.fault-injection-panel {\n    background: white;\n    border-radius: 8px;\n    padding: 15px;\n    box-shadow: 0 2px 4px rgba(0,0,0,0.1);\n}\n\n.fault-injection-panel h4 {\n    margin: 0 0 15px 0;\n    color: #495057;\n    font-size: 16px;\n    border-bottom: 2px solid #004B87;\n    padding-bottom: 5px;\n}\n\n.fault-section {\n    margin-bottom: 15px;\n}\n\n.fault-section h5 {\n    margin: 0 0 8px 0;\n    color: #6c757d;\n    font-size: 12px;\n    text-transform: uppercase;\n    font-weight: 600;\n}\n\n.fault-controls {\n    display: flex;\n    flex-direction: column;\n    gap: 5px;\n}\n\n.fault-btn {\n    background: #f8f9fa;\n    border: 1px solid #dee2e6;\n    border-radius: 4px;\n    padding: 8px 12px;\n    font-size: 11px;\n    cursor: pointer;\n    transition: all 0.2s;\n    color: #495057;\n}\n\n.fault-btn:hover {\n    background: #e9ecef;\n    border-color: #adb5bd;\n}\n\n.fault-btn.active {\n    background: #dc3545;\n    border-color: #dc3545;\n    color: white;\n    font-weight: 600;\n}\n\n.clear-all-btn {\n    background: #28a745;\n    border: none;\n    border-radius: 4px;\n    padding: 10px;\n    color: white;\n    font-weight: 600;\n    cursor: pointer;\n    width: 100%;\n    transition: background 0.2s;\n}\n\n.clear-all-btn:hover {\n    background: #218838;\n}\n</style>\n\n<script>\n(function(scope) {\n    scope.activeFaults = {};\n    \n    scope.injectFault = function(category, type) {\n        const faultKey = category + '_' + type;\n        scope.activeFaults[faultKey] = !scope.activeFaults[faultKey];\n        \n        // Send fault injection command\n        scope.send({\n            topic: 'datacenter/commands/fault_injection',\n            payload: {\n                command: scope.activeFaults[faultKey] ? 'inject' : 'clear',\n                category: category,\n                type: type,\n                timestamp: new Date().toISOString()\n            }\n        });\n    };\n    \n    scope.clearAllFaults = function() {\n        scope.activeFaults = {};\n        \n        scope.send({\n            topic: 'datacenter/commands/fault_injection',\n            payload: {\n                command: 'clear_all',\n                timestamp: new Date().toISOString()\n            }\n        });\n    };\n})(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 250,
+        "y": 420,
+        "wires": [["fault_command_out"]]
+    },
+    {
+        "id": "role_override_controls",
+        "type": "ui_template",
+        "z": "f7c23e1a.b3c8a",
+        "group": "role_override_group",
+        "name": "Role Override Panel",
+        "order": 1,
+        "width": "4",
+        "height": "6",
+        "format": "<div class=\"role-override-panel\">\n    <h4>Role Override Controls</h4>\n    \n    <!-- Individual Unit Controls -->\n    <div class=\"unit-controls\">\n        <div class=\"unit-section\" ng-repeat=\"unit in units\">\n            <h5>{{unit.id}}</h5>\n            <div class=\"current-role\">\n                Current: <span class=\"role-badge\" ng-class=\"'role-' + unit.role.toLowerCase()\">{{unit.role}}</span>\n            </div>\n            \n            <div class=\"role-buttons\">\n                <button class=\"role-btn\" ng-click=\"setRole(unit.id, 'LEAD')\" ng-class=\"{'active': unit.role === 'LEAD'}\">\n                    LEAD\n                </button>\n                <button class=\"role-btn\" ng-click=\"setRole(unit.id, 'LAG')\" ng-class=\"{'active': unit.role === 'LAG'}\">\n                    LAG\n                </button>\n                <button class=\"role-btn\" ng-click=\"setRole(unit.id, 'STANDBY')\" ng-class=\"{'active': unit.role === 'STANDBY'}\">\n                    STANDBY\n                </button>\n            </div>\n            \n            <div class=\"maintenance-controls\">\n                <button class=\"maint-btn\" ng-click=\"toggleMaintenance(unit.id)\" ng-class=\"{'active': unit.maintenance}\">\n                    <span ng-show=\"!unit.maintenance\">🔧 Maintenance Mode</span>\n                    <span ng-show=\"unit.maintenance\">✓ Exit Maintenance</span>\n                </button>\n            </div>\n        </div>\n    </div>\n    \n    <!-- Global Controls -->\n    <div class=\"global-controls\">\n        <button class=\"global-btn auto-btn\" ng-click=\"enableAutoMode()\" ng-class=\"{'active': autoMode}\">\n            🤖 Auto Mode\n        </button>\n        <button class=\"global-btn manual-btn\" ng-click=\"enableManualMode()\" ng-class=\"{'active': !autoMode}\">\n            👤 Manual Mode\n        </button>\n    </div>\n</div>\n\n<style>\n.role-override-panel {\n    background: white;\n    border-radius: 8px;\n    padding: 15px;\n    box-shadow: 0 2px 4px rgba(0,0,0,0.1);\n}\n\n.role-override-panel h4 {\n    margin: 0 0 15px 0;\n    color: #495057;\n    font-size: 16px;\n    border-bottom: 2px solid #004B87;\n    padding-bottom: 5px;\n}\n\n.unit-section {\n    margin-bottom: 15px;\n    padding: 10px;\n    background: #f8f9fa;\n    border-radius: 6px;\n    border-left: 4px solid #004B87;\n}\n\n.unit-section h5 {\n    margin: 0 0 8px 0;\n    color: #495057;\n    font-size: 14px;\n    font-weight: 600;\n}\n\n.current-role {\n    margin-bottom: 8px;\n    font-size: 12px;\n    color: #6c757d;\n}\n\n.role-badge {\n    padding: 2px 6px;\n    border-radius: 3px;\n    font-weight: 600;\n    font-size: 10px;\n    text-transform: uppercase;\n}\n\n.role-badge.role-lead {\n    background: #d4edda;\n    color: #155724;\n}\n\n.role-badge.role-lag {\n    background: #fff3cd;\n    color: #856404;\n}\n\n.role-badge.role-standby {\n    background: #f8d7da;\n    color: #721c24;\n}\n\n.role-buttons {\n    display: flex;\n    gap: 3px;\n    margin-bottom: 8px;\n}\n\n.role-btn {\n    flex: 1;\n    background: #f8f9fa;\n    border: 1px solid #dee2e6;\n    border-radius: 3px;\n    padding: 6px 4px;\n    font-size: 10px;\n    cursor: pointer;\n    transition: all 0.2s;\n    font-weight: 500;\n}\n\n.role-btn:hover {\n    background: #e9ecef;\n}\n\n.role-btn.active {\n    background: #004B87;\n    border-color: #004B87;\n    color: white;\n}\n\n.maint-btn {\n    width: 100%;\n    background: #6c757d;\n    border: none;\n    border-radius: 4px;\n    padding: 6px;\n    color: white;\n    font-size: 10px;\n    cursor: pointer;\n    transition: all 0.2s;\n}\n\n.maint-btn:hover {\n    background: #5a6268;\n}\n\n.maint-btn.active {\n    background: #ffc107;\n    color: #212529;\n    font-weight: 600;\n}\n\n.global-controls {\n    display: flex;\n    gap: 8px;\n    margin-top: 15px;\n    padding-top: 15px;\n    border-top: 1px solid #dee2e6;\n}\n\n.global-btn {\n    flex: 1;\n    border: none;\n    border-radius: 4px;\n    padding: 10px;\n    font-size: 11px;\n    font-weight: 600;\n    cursor: pointer;\n    transition: all 0.2s;\n}\n\n.auto-btn {\n    background: #28a745;\n    color: white;\n}\n\n.auto-btn:hover {\n    background: #218838;\n}\n\n.manual-btn {\n    background: #ffc107;\n    color: #212529;\n}\n\n.manual-btn:hover {\n    background: #e0a800;\n}\n\n.global-btn.active {\n    transform: scale(0.95);\n    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);\n}\n</style>\n\n<script>\n(function(scope) {\n    scope.units = [\n        { id: 'CRAC-01', role: 'LEAD', maintenance: false },\n        { id: 'CRAC-02', role: 'LAG', maintenance: false },\n        { id: 'CRAC-03', role: 'STANDBY', maintenance: false }\n    ];\n    \n    scope.autoMode = true;\n    \n    scope.setRole = function(unitId, newRole) {\n        const unit = scope.units.find(u => u.id === unitId);\n        if (unit) {\n            unit.role = newRole;\n            \n            scope.send({\n                topic: 'datacenter/commands/role_override',\n                payload: {\n                    command: 'set_role',\n                    unit_id: unitId,\n                    role: newRole,\n                    timestamp: new Date().toISOString()\n                }\n            });\n        }\n    };\n    \n    scope.toggleMaintenance = function(unitId) {\n        const unit = scope.units.find(u => u.id === unitId);\n        if (unit) {\n            unit.maintenance = !unit.maintenance;\n            \n            scope.send({\n                topic: 'datacenter/commands/maintenance',\n                payload: {\n                    command: unit.maintenance ? 'enter_maintenance' : 'exit_maintenance',\n                    unit_id: unitId,\n                    timestamp: new Date().toISOString()\n                }\n            });\n        }\n    };\n    \n    scope.enableAutoMode = function() {\n        scope.autoMode = true;\n        scope.send({\n            topic: 'datacenter/commands/mode',\n            payload: {\n                command: 'set_mode',\n                mode: 'auto',\n                timestamp: new Date().toISOString()\n            }\n        });\n    };\n    \n    scope.enableManualMode = function() {\n        scope.autoMode = false;\n        scope.send({\n            topic: 'datacenter/commands/mode',\n            payload: {\n                command: 'set_mode',\n                mode: 'manual',\n                timestamp: new Date().toISOString()\n            }\n        });\n    };\n})(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 470,
+        "y": 420,
+        "wires": [["role_command_out"]]
+    },
+    {
+        "id": "room_temp_display",
+        "type": "ui_gauge",
+        "z": "f7c23e1a.b3c8a",
+        "name": "Zone Temperature",
+        "group": "1a2b3c4d.e5f6g7",
+        "order": 1,
+        "width": "4",
+        "height": "3",
+        "gtype": "gage",
+        "title": "Zone Temperature",
+        "label": "°C",
+        "format": "{{value}}",
+        "min": "18",
+        "max": "28",
+        "colors": [
+            "#007bff",
+            "#28a745",
+            "#ffc107",
+            "#fd7e14",
+            "#dc3545"
+        ],
+        "seg1": "20",
+        "seg2": "22",
+        "seg3": "24",
+        "seg4": "26",
+        "className": "temperature-gauge",
+        "x": 560,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "crac_status_table",
+        "type": "ui_table",
+        "z": "f7c23e1a.b3c8a",
+        "group": "2b3c4d5e.f6g7h8",
+        "name": "CRAC Status Table",
+        "order": 1,
+        "width": "8",
+        "height": "4",
+        "columns": [
+            {
+                "field": "unit_id",
+                "title": "Unit",
+                "width": "80px",
+                "align": "center",
+                "formatter": "plaintext"
+            },
+            {
+                "field": "role",
+                "title": "Role",
+                "width": "80px",
+                "align": "center",
+                "formatter": "color",
+                "formatterParams": {
+                    "LEAD": "#28a745",
+                    "LAG": "#ffc107", 
+                    "STANDBY": "#6c757d"
+                }
+            },
+            {
+                "field": "status",
+                "title": "Status",
+                "width": "80px",
+                "align": "center",
+                "formatter": "color",
+                "formatterParams": {
+                    "running": "#28a745",
+                    "starting": "#ffc107",
+                    "stopping": "#fd7e14",
+                    "off": "#6c757d",
+                    "failed": "#dc3545",
+                    "maintenance": "#17a2b8"
+                }
+            },
+            {
+                "field": "cmd_pct",
+                "title": "Command %",
+                "width": "100px",
+                "align": "center",
+                "formatter": "progress",
+                "formatterParams": {
+                    "min": 0,
+                    "max": 100,
+                    "color": "#004B87"
+                }
+            },
+            {
+                "field": "q_cool_kw",
+                "title": "Cooling kW",
+                "width": "90px",
+                "align": "center",
+                "formatter": "money",
+                "formatterParams": {
+                    "precision": 1,
+                    "symbol": "",
+                    "symbolAfter": " kW"
+                }
+            },
+            {
+                "field": "power_kw",
+                "title": "Power kW",
+                "width": "90px",
+                "align": "center",
+                "formatter": "money",
+                "formatterParams": {
+                    "precision": 1,
+                    "symbol": "",
+                    "symbolAfter": " kW"
+                }
+            },
+            {
+                "field": "efficiency_cop",
+                "title": "COP",
+                "width": "60px",
+                "align": "center",
+                "formatter": "money",
+                "formatterParams": {
+                    "precision": 2,
+                    "symbol": "",
+                    "symbolAfter": ""
+                }
+            }
+        ],
+        "outputs": 0,
+        "cts": false,
+        "className": "crac-table",
+        "x": 580,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "data_source_mqtt",
+        "type": "mqtt in",
+        "z": "f7c23e1a.b3c8a",
+        "name": "BAS Data Input",
+        "topic": "datacenter/+/+",
+        "qos": "1",
+        "datatype": "json",
+        "broker": "mqtt_broker",
+        "x": 120,
+        "y": 600,
+        "wires": [["data_parser"]]
+    },
+    {
+        "id": "mqtt_broker",
+        "type": "mqtt-broker",
+        "name": "Local MQTT Broker",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "nodered_hmi_enhanced",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true
+    },
+    {
+        "id": "fault_command_out",
+        "type": "mqtt out",
+        "z": "f7c23e1a.b3c8a",
+        "name": "Fault Commands",
+        "topic": "",
+        "qos": "1",
+        "retain": "false",
+        "broker": "mqtt_broker",
+        "x": 470,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "role_command_out",
+        "type": "mqtt out",
+        "z": "f7c23e1a.b3c8a",
+        "name": "Role Commands",
+        "topic": "",
+        "qos": "1",
+        "retain": "false",
+        "broker": "mqtt_broker",
+        "x": 690,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "data_parser",
+        "type": "function",
+        "z": "f7c23e1a.b3c8a",
+        "name": "Enhanced Data Parser",
+        "func": "// Enhanced parsing for professional HMI\nconst topic = msg.topic;\nconst data = msg.payload;\n\n// Route data based on topic with enhanced processing\nif (topic.includes('/room/')) {\n    // Room temperature data with additional processing\n    msg.payload = {\n        temp_c: data.temp_c || 22.0,\n        setpoint_c: data.setpoint_c || 22.0,\n        it_load_kw: data.it_load_kw || 0,\n        error_c: (data.temp_c || 22.0) - (data.setpoint_c || 22.0),\n        timestamp: new Date().toISOString(),\n        system_online: true\n    };\n    return [msg, null, null, null, null];\n} else if (topic.includes('/crac/')) {\n    // Enhanced CRAC unit data\n    const efficiency = data.q_cool_kw > 0 ? (data.q_cool_kw / data.power_kw) : 0;\n    msg.payload = {\n        unit_id: data.unit_id || 'UNKNOWN',\n        role: data.role || 'standby',\n        status: data.failed ? 'failed' : (data.status || 'off'),\n        cmd_pct: Math.round(data.cmd_pct || 0),\n        q_cool_kw: (data.q_cool_kw || 0).toFixed(1),\n        power_kw: (data.power_kw || 0).toFixed(1),\n        efficiency_cop: efficiency.toFixed(2),\n        failed: data.failed || false,\n        maintenance: data.maintenance || false,\n        timestamp: new Date().toISOString()\n    };\n    return [null, msg, null, null, null];\n} else if (topic.includes('/alarms/')) {\n    // Enhanced alarm data with priority counts\n    const alarms = data.active_alarms || [];\n    const priorityBreakdown = {\n        critical: alarms.filter(a => a.priority === 'critical').length,\n        high: alarms.filter(a => a.priority === 'high').length,\n        medium: alarms.filter(a => a.priority === 'medium').length,\n        low: alarms.filter(a => a.priority === 'low').length\n    };\n    \n    msg.payload = {\n        active_alarms: alarms,\n        alarm_summary: {\n            ...data.alarm_summary,\n            priority_breakdown: priorityBreakdown,\n            total_active: alarms.length\n        },\n        timestamp: new Date().toISOString()\n    };\n    return [null, null, msg, null, null];\n} else if (topic.includes('/system/')) {\n    // Enhanced system performance data\n    msg.payload = {\n        total_cooling_kw: (data.total_cooling_kw || 0).toFixed(1),\n        total_power_kw: (data.total_power_kw || 0).toFixed(1),\n        efficiency_cop: (data.efficiency_cop || 0).toFixed(2),\n        lag_staged: data.lag_staged || false,\n        standby_staged: data.standby_staged || false,\n        system_online: true,\n        timestamp: new Date().toISOString()\n    };\n    return [null, null, null, msg, null];\n} else if (topic.includes('/commands/')) {\n    // Command acknowledgment\n    msg.payload = {\n        command_ack: true,\n        original_command: data,\n        timestamp: new Date().toISOString()\n    };\n    return [null, null, null, null, msg];\n}\n\nreturn null;",
+        "outputs": 5,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 340,
+        "y": 600,
+        "wires": [
+            ["room_temp_display", "mimic_diagram", "header_display"],
+            ["crac_status_table", "mimic_diagram"],
+            ["alarm_display"],
+            ["system_metrics", "mimic_diagram"],
+            ["command_feedback"]
+        ]
+    },
+    {
+        "id": "alarm_display",
+        "type": "ui_table",
+        "z": "f7c23e1a.b3c8a",
+        "group": "3c4d5e6f.g7h8i9",
+        "name": "Enhanced Alarm Display",
+        "order": 1,
+        "width": "12",
+        "height": "3",
+        "columns": [
+            {
+                "field": "priority",
+                "title": "Priority",
+                "width": "80px",
+                "align": "center",
+                "formatter": "color",
+                "formatterParams": {
+                    "critical": "#dc3545",
+                    "high": "#fd7e14",
+                    "medium": "#ffc107",
+                    "low": "#28a745"
+                }
+            },
+            {
+                "field": "alarm_id",
+                "title": "Alarm ID",
+                "width": "120px",
+                "align": "left",
+                "formatter": "plaintext"
+            },
+            {
+                "field": "description",
+                "title": "Description",
+                "width": "",
+                "align": "left",
+                "formatter": "plaintext"
+            },
+            {
+                "field": "state",
+                "title": "State",
+                "width": "100px",
+                "align": "center",
+                "formatter": "color",
+                "formatterParams": {
+                    "active": "#dc3545",
+                    "acknowledged": "#ffc107",
+                    "cleared": "#28a745"
+                }
+            },
+            {
+                "field": "alarm_time",
+                "title": "Time",
+                "width": "120px",
+                "align": "center",
+                "formatter": "datetime",
+                "formatterParams": {
+                    "inputFormat": "iso",
+                    "outputFormat": "HH:mm:ss"
+                }
+            },
+            {
+                "field": "duration",
+                "title": "Duration",
+                "width": "100px",
+                "align": "center",
+                "formatter": "plaintext"
+            }
+        ],
+        "outputs": 0,
+        "cts": false,
+        "className": "alarm-table",
+        "x": 590,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "system_metrics",
+        "type": "function",
+        "z": "f7c23e1a.b3c8a",
+        "name": "System Metrics Processor",
+        "func": "// Process system metrics for enhanced display\nconst data = msg.payload;\n\n// Calculate additional metrics\nconst timestamp = new Date().getTime();\nconst efficiency = data.total_cooling_kw > 0 ? \n    (parseFloat(data.total_cooling_kw) / parseFloat(data.total_power_kw)) : 0;\n\n// Prepare chart data\nmsg.payload = {\n    chart_data: [{\n        series: [\"Cooling Output\", \"Power Input\", \"Efficiency x10\"],\n        data: [\n            [timestamp, parseFloat(data.total_cooling_kw)],\n            [timestamp, parseFloat(data.total_power_kw)],\n            [timestamp, efficiency * 10] // Scale for visibility\n        ]\n    }],\n    metrics: {\n        total_cooling: data.total_cooling_kw,\n        total_power: data.total_power_kw,\n        efficiency: efficiency.toFixed(2),\n        lag_staged: data.lag_staged,\n        standby_staged: data.standby_staged,\n        timestamp: data.timestamp\n    }\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 600,
+        "y": 720,
+        "wires": [["performance_chart", "metrics_display"]]
+    },
+    {
+        "id": "performance_chart",
+        "type": "ui_chart",
+        "z": "f7c23e1a.b3c8a",
+        "name": "Enhanced Performance Chart",
+        "group": "5e6f7g8h.i9j0k1",
+        "order": 1,
+        "width": "8",
+        "height": "4",
+        "label": "System Performance Trends",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "Waiting for data...",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "",
+        "removeOlder": "10",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "60",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#004B87",
+            "#dc3545", 
+            "#28a745",
+            "#ffc107",
+            "#17a2b8"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "performance-chart",
+        "x": 820,
+        "y": 720,
+        "wires": [[]]
+    },
+    {
+        "id": "metrics_display",
+        "type": "ui_template",
+        "z": "f7c23e1a.b3c8a",
+        "group": "5e6f7g8h.i9j0k1",
+        "name": "Enhanced Metrics Display",
+        "order": 2,
+        "width": "4",
+        "height": "4",
+        "format": "<div class=\"metrics-display\">\n    <div class=\"metric-card\">\n        <div class=\"metric-value\">{{msg.payload.metrics.total_cooling}}</div>\n        <div class=\"metric-label\">Total Cooling (kW)</div>\n        <div class=\"metric-trend\" ng-class=\"getTrendClass('cooling')\">{{getTrendArrow('cooling')}}</div>\n    </div>\n    \n    <div class=\"metric-card\">\n        <div class=\"metric-value\">{{msg.payload.metrics.total_power}}</div>\n        <div class=\"metric-label\">Total Power (kW)</div>\n        <div class=\"metric-trend\" ng-class=\"getTrendClass('power')\">{{getTrendArrow('power')}}</div>\n    </div>\n    \n    <div class=\"metric-card\">\n        <div class=\"metric-value\">{{msg.payload.metrics.efficiency}}</div>\n        <div class=\"metric-label\">System COP</div>\n        <div class=\"metric-trend\" ng-class=\"getTrendClass('efficiency')\">{{getTrendArrow('efficiency')}}</div>\n    </div>\n    \n    <div class=\"status-indicators\">\n        <div class=\"status-item\" ng-class=\"{'active': msg.payload.metrics.lag_staged}\">\n            <span class=\"status-icon\">⚡</span>\n            <span>LAG Staged</span>\n        </div>\n        <div class=\"status-item\" ng-class=\"{'active': msg.payload.metrics.standby_staged}\">\n            <span class=\"status-icon\">🚨</span>\n            <span>STANDBY Active</span>\n        </div>\n    </div>\n</div>\n\n<style>\n.metrics-display {\n    display: grid;\n    grid-template-columns: 1fr 1fr;\n    gap: 10px;\n    padding: 10px;\n}\n\n.metric-card {\n    background: white;\n    border-radius: 8px;\n    padding: 15px;\n    text-align: center;\n    box-shadow: 0 2px 4px rgba(0,0,0,0.1);\n    border-left: 4px solid #004B87;\n    position: relative;\n}\n\n.metric-value {\n    font-size: 24px;\n    font-weight: 700;\n    color: #004B87;\n    margin-bottom: 5px;\n}\n\n.metric-label {\n    font-size: 12px;\n    color: #6c757d;\n    text-transform: uppercase;\n    font-weight: 600;\n}\n\n.metric-trend {\n    position: absolute;\n    top: 10px;\n    right: 10px;\n    font-size: 16px;\n}\n\n.trend-up { color: #28a745; }\n.trend-down { color: #dc3545; }\n.trend-stable { color: #6c757d; }\n\n.status-indicators {\n    grid-column: 1 / -1;\n    display: flex;\n    justify-content: space-around;\n    margin-top: 10px;\n    padding: 10px;\n    background: #f8f9fa;\n    border-radius: 6px;\n}\n\n.status-item {\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    gap: 5px;\n    opacity: 0.5;\n    transition: all 0.3s;\n}\n\n.status-item.active {\n    opacity: 1;\n    color: #dc3545;\n    font-weight: 600;\n}\n\n.status-icon {\n    font-size: 20px;\n}\n</style>\n\n<script>\n(function(scope) {\n    scope.previousValues = {};\n    \n    scope.getTrendClass = function(metric) {\n        const current = parseFloat(scope.msg?.payload?.metrics?.[metric] || 0);\n        const previous = scope.previousValues[metric] || current;\n        \n        if (current > previous) return 'trend-up';\n        if (current < previous) return 'trend-down';\n        return 'trend-stable';\n    };\n    \n    scope.getTrendArrow = function(metric) {\n        const current = parseFloat(scope.msg?.payload?.metrics?.[metric] || 0);\n        const previous = scope.previousValues[metric] || current;\n        \n        scope.previousValues[metric] = current;\n        \n        if (current > previous) return '↗';\n        if (current < previous) return '↘';\n        return '→';\n    };\n})(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 820,
+        "y": 780,
+        "wires": [[]]
+    },
+    {
+        "id": "command_feedback",
+        "type": "ui_toast",
+        "z": "f7c23e1a.b3c8a",
+        "position": "top right",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "className": "",
+        "name": "Command Feedback",
+        "x": 590,
+        "y": 780,
+        "wires": []
+    }
+]

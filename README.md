@@ -167,7 +167,10 @@ python main.py run --config config/default.yaml --scenario crac_failure
 # Override parameters
 python main.py run --config config/default.yaml --set room.it_load_kw=60.0
 
-# Launch HMI dashboard
+# Launch enhanced HMI dashboard
+node-red hmi/enhanced-node-red-flows.json
+
+# Or use basic dashboard
 node-red hmi/node-red-flows.json
 ```
 
@@ -440,13 +443,78 @@ reports/fault_demo/
 
 ## Monitoring & HMI
 
-### Node-RED Dashboard
-- Real-time temperature display with alarm indicators
-- CRAC status table showing role, capacity, and power consumption
-- Manual controls for setpoint adjustment and equipment testing
-- Historical trending with configurable data retention
-- **Fault Status Indicators**: Live diagnostic system status
-- **Health Score Display**: Overall system performance metrics
+### Professional Node-RED Dashboard
+
+**Enhanced Visual Interface:**
+- Interactive data center floor plan with real-time mimic diagram
+- Animated airflow visualization showing cooling distribution patterns
+- Color-coded temperature zones with live heat mapping
+- Professional header with system status indicators and company branding
+- Custom CSS styling for clean, modern appearance
+
+**Comprehensive Status Monitoring:**
+- Real-time temperature gauge with ASHRAE compliance indicators
+- Enhanced CRAC status table with role, command %, cooling output, power, and COP
+- Active alarm display with priority-based color coding and duration tracking
+- System performance trends with cooling/power efficiency metrics
+- Equipment staging indicators showing LAG/STANDBY activation status
+
+**Advanced Control Capabilities:**
+- **Temperature Control**: Setpoint adjustment slider (18-26°C)
+- **Load Testing**: IT load override for scenario validation (20-100 kW)
+- **Role Management**: Individual unit role assignment (LEAD/LAG/STANDBY)
+- **Maintenance Mode**: Per-unit maintenance toggles with auto/manual mode switching
+- **Advanced Fault Injection**: Comprehensive fault simulation controls
+
+### Interactive Mimic Diagram
+
+**Data Center Floor Layout:**
+- Accurate representation of hot/cold aisle configuration
+- Server rack positions with visual equipment indicators
+- CRAC unit placement showing physical cooling distribution
+- Real-time temperature zones with color-coded thermal mapping
+- Animated airflow arrows indicating active cooling patterns
+
+**Live Equipment Visualization:**
+- CRAC units change color based on operational status (running/failed/maintenance)
+- Temperature zones update in real-time with graduated color scaling
+- Airflow animations activate only when units are running
+- Equipment labels show role, status, and key performance metrics
+- Interactive hover states provide detailed equipment information
+
+### Enhanced Fault Injection Controls
+
+**Sensor Fault Simulation:**
+- Temperature sensor drift injection
+- Sensor bias and calibration errors
+- Stuck reading simulation
+- Signal noise injection
+
+**Actuator Fault Simulation:**
+- Valve stiction and backlash
+- Actuator oscillation patterns
+- Performance degradation simulation
+- Partial failure scenarios
+
+**Control System Faults:**
+- PID controller instability
+- Short-cycling simulation
+- Controller saturation/windup
+- Communication dropout scenarios
+
+### Role Override & Maintenance Controls
+
+**Individual Unit Management:**
+- Real-time role assignment (LEAD/LAG/STANDBY)
+- Maintenance mode activation per unit
+- Manual staging override capabilities
+- Auto/Manual mode switching
+
+**System-Wide Controls:**
+- Global role rotation commands
+- Emergency staging overrides
+- System-wide maintenance coordination
+- Operational mode management
 
 #### Telemetry Data Flow
 
@@ -528,7 +596,8 @@ data-center-bas-sim-main/
 ├── tools/                   # Legacy utilities
 │   └── run_scenario.py      # Original scenario runner
 ├── hmi/                     # Human-machine interface
-│   └── node-red-flows.json  # Dashboard configuration
+│   ├── node-red-flows.json      # Basic dashboard configuration
+│   └── enhanced-node-red-flows.json # Professional HMI with mimic diagram
 ├── reports/                 # Documentation and results
 └── main.py                  # Professional CLI interface
 ```

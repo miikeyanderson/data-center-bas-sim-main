@@ -341,7 +341,8 @@ app.get('/', (req, res) => {
 // Node-RED settings
 const settings = {
     httpAdminRoot: "/red",
-    httpNodeRoot: "/api", 
+    httpNodeRoot: "/api",
+    httpStatic: path.join(__dirname, 'public'),
     userDir: path.join(__dirname, '.node-red'),
     flowFile: "demo-flows.json",
     credentialsFile: "demo-flows_cred.json",
@@ -366,6 +367,9 @@ const settings = {
         palette: {
             theme: "default"
         }
+    },
+    ui: {
+        path: "ui"
     }
 };
 
@@ -375,6 +379,15 @@ RED.init(server, settings);
 // Add the Node-RED UI and admin endpoints
 app.use(settings.httpAdminRoot, RED.httpAdmin);
 app.use(settings.httpNodeRoot, RED.httpNode);
+
+// Explicit route for dashboard UI
+app.get('/ui', (req, res) => {
+    res.redirect('/ui/');
+});
+
+app.get('/ui/', (req, res) => {
+    res.redirect(settings.httpNodeRoot + '/ui/');
+});
 
 // Copy production flows to demo flows
 const productionFlowsPath = path.join(__dirname, 'hmi', 'production-node-red-flows.json');

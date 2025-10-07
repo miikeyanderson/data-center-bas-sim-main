@@ -463,4 +463,460 @@ properties:
             default: 13
             description: "IT load analog input instance"
 
+  fault_simulation:
+    type: object
+    properties:
+      enable_faults:
+        type: boolean
+        default: true
+        description: "Enable fault simulation system"
+      random_seed:
+        type: integer
+        minimum: 1
+        maximum: 999999
+        description: "Random seed for deterministic fault injection"
+      sensor_faults:
+        type: object
+        properties:
+          enable:
+            type: boolean
+            default: true
+            description: "Enable sensor fault simulation"
+          temperature_sensors:
+            type: array
+            items:
+              type: object
+              properties:
+                sensor_id:
+                  type: string
+                  description: "Sensor identifier"
+                location:
+                  type: string
+                  description: "Sensor location"
+                enable_faults:
+                  type: boolean
+                  default: true
+                  description: "Enable faults for this sensor"
+                fault_types:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: ["drift", "bias", "intermittent", "noise", "stuck"]
+                        description: "Type of fault to simulate"
+                      probability:
+                        type: number
+                        minimum: 0.0
+                        maximum: 1.0
+                        description: "Fault probability per timestep"
+                      drift_rate:
+                        type: number
+                        minimum: 0.0
+                        description: "Drift rate (units/hour)"
+                      max_drift:
+                        type: number
+                        minimum: 0.0
+                        description: "Maximum total drift"
+                      bias_offset:
+                        type: number
+                        description: "Systematic bias offset"
+                      dropout_duration:
+                        type: number
+                        minimum: 0.0
+                        description: "Average dropout duration (seconds)"
+                      noise_amplitude:
+                        type: number
+                        minimum: 0.0
+                        description: "RMS noise amplitude"
+                      stuck_value:
+                        type: ["number", "null"]
+                        description: "Value to stick at (null = current)"
+      actuator_faults:
+        type: object
+        properties:
+          enable:
+            type: boolean
+            default: true
+            description: "Enable actuator fault simulation"
+          crac_dampers:
+            type: array
+            items:
+              type: object
+              properties:
+                actuator_id:
+                  type: string
+                  description: "Actuator identifier"
+                location:
+                  type: string
+                  description: "Actuator location"
+                enable_faults:
+                  type: boolean
+                  default: true
+                  description: "Enable faults for this actuator"
+                fault_types:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: ["stiction", "backlash", "degradation", "oscillation", "partial_failure"]
+                        description: "Type of actuator fault"
+                      probability:
+                        type: number
+                        minimum: 0.0
+                        maximum: 1.0
+                        description: "Fault probability per timestep"
+                      breakaway_threshold:
+                        type: number
+                        minimum: 0.0
+                        description: "Minimum command change to overcome stiction"
+                      static_friction:
+                        type: number
+                        minimum: 0.0
+                        description: "Static friction resistance"
+                      deadband:
+                        type: number
+                        minimum: 0.0
+                        description: "Deadband percentage"
+                      hysteresis_factor:
+                        type: number
+                        minimum: 0.0
+                        description: "Hysteresis strength factor"
+                      response_degradation:
+                        type: number
+                        minimum: 0.0
+                        maximum: 1.0
+                        description: "Response degradation factor"
+                      accuracy_loss:
+                        type: number
+                        minimum: 0.0
+                        description: "Position accuracy loss percentage"
+                      amplitude:
+                        type: number
+                        minimum: 0.0
+                        description: "Oscillation amplitude"
+                      frequency:
+                        type: number
+                        minimum: 0.0
+                        description: "Oscillation frequency (Hz)"
+                      failure_rate:
+                        type: number
+                        minimum: 0.0
+                        description: "Failure progression rate"
+      control_faults:
+        type: object
+        properties:
+          enable:
+            type: boolean
+            default: true
+            description: "Enable control system fault simulation"
+          pid_controller:
+            type: object
+            properties:
+              enable_faults:
+                type: boolean
+                default: true
+                description: "Enable PID controller faults"
+              fault_types:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum: ["short_cycling", "controller_saturation", "communication_dropout", "loop_instability"]
+                      description: "Type of control fault"
+                    probability:
+                      type: number
+                      minimum: 0.0
+                      maximum: 1.0
+                      description: "Fault probability per timestep"
+                    cycle_threshold:
+                      type: number
+                      minimum: 0.0
+                      description: "Normal cycle time threshold (seconds)"
+                    short_cycle_ratio:
+                      type: number
+                      minimum: 0.0
+                      maximum: 1.0
+                      description: "Short cycle ratio of normal"
+                    saturation_threshold:
+                      type: number
+                      minimum: 0.0
+                      maximum: 100.0
+                      description: "Saturation threshold percentage"
+                    saturation_duration:
+                      type: number
+                      minimum: 0.0
+                      description: "Minimum saturation duration (seconds)"
+                    dropout_duration:
+                      type: number
+                      minimum: 0.0
+                      description: "Average dropout duration (seconds)"
+                    max_dropout:
+                      type: number
+                      minimum: 0.0
+                      description: "Maximum dropout duration (seconds)"
+                    instability_gain:
+                      type: number
+                      minimum: 1.0
+                      description: "Instability gain increase factor"
+                    oscillation_period:
+                      type: number
+                      minimum: 0.0
+                      description: "Oscillation period (seconds)"
+      equipment_faults:
+        type: object
+        properties:
+          enable:
+            type: boolean
+            default: true
+            description: "Enable additional equipment faults"
+          crac_units:
+            type: array
+            items:
+              type: object
+              properties:
+                unit_id:
+                  type: string
+                  description: "CRAC unit identifier"
+                additional_faults:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: ["performance_degradation", "efficiency_loss", "refrigerant_leak", "compressor_wear"]
+                        description: "Equipment fault type"
+                      probability:
+                        type: number
+                        minimum: 0.0
+                        maximum: 1.0
+                        description: "Fault probability per timestep"
+                      degradation_rate:
+                        type: number
+                        minimum: 0.0
+                        description: "Performance degradation rate"
+                      max_degradation:
+                        type: number
+                        minimum: 0.0
+                        maximum: 100.0
+                        description: "Maximum degradation percentage"
+                      efficiency_loss_rate:
+                        type: number
+                        minimum: 0.0
+                        description: "Efficiency loss rate per hour"
+                      leak_rate:
+                        type: number
+                        minimum: 0.0
+                        description: "Leak rate (capacity loss per hour)"
+                      wear_factor:
+                        type: number
+                        minimum: 1.0
+                        description: "Wear factor (performance reduction)"
+
+  diagnostics:
+    type: object
+    properties:
+      enable:
+        type: boolean
+        default: true
+        description: "Enable diagnostic system"
+      engine:
+        type: object
+        properties:
+          evaluation_interval_s:
+            type: number
+            minimum: 1.0
+            maximum: 3600.0
+            default: 60.0
+            description: "Diagnostic evaluation interval (seconds)"
+          confidence_threshold:
+            type: number
+            minimum: 0.0
+            maximum: 1.0
+            default: 0.7
+            description: "Minimum confidence for fault confirmation"
+          data_buffer_size:
+            type: integer
+            minimum: 100
+            maximum: 10000
+            default: 1000
+            description: "Maximum data points to store"
+          rules:
+            type: object
+            properties:
+              sensor_drift_detection:
+                type: object
+                properties:
+                  enable:
+                    type: boolean
+                    default: true
+                    description: "Enable sensor drift detection"
+                  evaluation_interval_s:
+                    type: number
+                    minimum: 1.0
+                    maximum: 3600.0
+                    description: "Evaluation interval (seconds)"
+                  confirmation_time_s:
+                    type: number
+                    minimum: 1.0
+                    maximum: 7200.0
+                    description: "Confirmation time (seconds)"
+                  drift_threshold:
+                    type: number
+                    minimum: 0.1
+                    maximum: 10.0
+                    description: "Drift threshold"
+              equipment_performance:
+                type: object
+                properties:
+                  enable:
+                    type: boolean
+                    default: true
+                    description: "Enable equipment performance monitoring"
+                  evaluation_interval_s:
+                    type: number
+                    minimum: 1.0
+                    maximum: 3600.0
+                    description: "Evaluation interval (seconds)"
+                  confirmation_time_s:
+                    type: number
+                    minimum: 1.0
+                    maximum: 7200.0
+                    description: "Confirmation time (seconds)"
+                  performance_threshold:
+                    type: number
+                    minimum: 0.0
+                    maximum: 1.0
+                    description: "Performance threshold ratio"
+              control_instability:
+                type: object
+                properties:
+                  enable:
+                    type: boolean
+                    default: true
+                    description: "Enable control instability detection"
+                  evaluation_interval_s:
+                    type: number
+                    minimum: 1.0
+                    maximum: 3600.0
+                    description: "Evaluation interval (seconds)"
+                  confirmation_time_s:
+                    type: number
+                    minimum: 1.0
+                    maximum: 7200.0
+                    description: "Confirmation time (seconds)"
+                  variability_threshold:
+                    type: number
+                    minimum: 1.0
+                    maximum: 100.0
+                    description: "Control signal variability threshold"
+              energy_efficiency:
+                type: object
+                properties:
+                  enable:
+                    type: boolean
+                    default: true
+                    description: "Enable energy efficiency monitoring"
+                  evaluation_interval_s:
+                    type: number
+                    minimum: 1.0
+                    maximum: 3600.0
+                    description: "Evaluation interval (seconds)"
+                  confirmation_time_s:
+                    type: number
+                    minimum: 1.0
+                    maximum: 7200.0
+                    description: "Confirmation time (seconds)"
+                  efficiency_threshold:
+                    type: number
+                    minimum: 0.0
+                    maximum: 1.0
+                    description: "Efficiency threshold ratio"
+      root_cause:
+        type: object
+        properties:
+          enable:
+            type: boolean
+            default: true
+            description: "Enable root cause analysis"
+          analysis_depth:
+            type: string
+            enum: ["summary", "standard", "detailed"]
+            default: "standard"
+            description: "Depth of root cause analysis"
+          correlation_threshold:
+            type: number
+            minimum: 0.0
+            maximum: 1.0
+            default: 0.6
+            description: "Minimum correlation for cause linkage"
+          evidence_weight:
+            type: number
+            minimum: 0.0
+            maximum: 10.0
+            default: 1.0
+            description: "Weight of supporting evidence"
+      reporting:
+        type: object
+        properties:
+          enable:
+            type: boolean
+            default: true
+            description: "Enable diagnostic reporting"
+          auto_generate:
+            type: boolean
+            default: true
+            description: "Automatically generate reports"
+          default_format:
+            type: string
+            enum: ["json", "csv", "markdown", "html"]
+            default: "markdown"
+            description: "Default report format"
+          output_directory:
+            type: string
+            default: "reports/diagnostics/"
+            description: "Report output directory"
+          include_charts:
+            type: boolean
+            default: true
+            description: "Include performance charts"
+          include_raw_data:
+            type: boolean
+            default: false
+            description: "Include raw diagnostic data"
+          daily_summary:
+            type: boolean
+            default: true
+            description: "Generate daily health summary"
+          weekly_analysis:
+            type: boolean
+            default: true
+            description: "Generate weekly trend analysis"
+          fault_reports:
+            type: boolean
+            default: true
+            description: "Generate immediate fault reports"
+          audience:
+            type: string
+            enum: ["executive", "technical", "maintenance"]
+            default: "technical"
+            description: "Target audience for reports"
+          detail_level:
+            type: string
+            enum: ["summary", "standard", "detailed"]
+            default: "standard"
+            description: "Level of detail in reports"
+          company_name:
+            type: string
+            description: "Company name for reports"
+          facility_name:
+            type: string
+            description: "Facility name for reports"
+
 additionalProperties: false

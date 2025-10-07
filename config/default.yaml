@@ -18,13 +18,13 @@ room:
 
 # PID Controller Configuration
 pid_controller:
-  kp: 8.0                           # Proportional gain (%/°C) - tuned for optimal response
-  ki: 0.3                           # Integral gain (%/(°C·s)) - improved steady-state
-  kd: 0.08                          # Derivative gain (%/(°C/s)) - light
+  kp: 15.0                          # Proportional gain (%/°C) - increased for better response
+  ki: 0.5                           # Integral gain (%/(°C·s)) - increased for steady-state
+  kd: 0.1                           # Derivative gain (%/(°C/s)) - light
   output_min: 0.0                   # Minimum output (%)
   output_max: 100.0                 # Maximum output (%)
-  rate_limit: 15.0                  # Maximum change rate (%/s) - protect actuators
-  integral_windup_limit: 40.0       # Integral windup protection (%)
+  rate_limit: 50.0                  # Maximum change rate (%/s) - increased for demos
+  integral_windup_limit: 80.0       # Integral windup protection (%) - increased
 
 # CRAC Unit Configuration
 # Note: Roles assigned automatically by sequencer (1st=LEAD, 2nd=LAG, 3rd+=STANDBY)
@@ -35,8 +35,8 @@ crac_units:
     rated_airflow_cfm: 8000.0       # Rated airflow (CFM)
     min_capacity_pct: 20.0          # Minimum capacity (%)
     max_capacity_pct: 100.0         # Maximum capacity (%)
-    startup_time_s: 180.0           # Startup time (seconds)
-    shutdown_time_s: 60.0           # Shutdown time (seconds)
+    startup_time_s: 30.0            # Startup time (seconds) - reduced for demos
+    shutdown_time_s: 15.0           # Shutdown time (seconds) - reduced for demos
     mtbf_hours: 8760.0              # Mean time between failures (hours) - 1 year
     mttr_hours: 4.0                 # Mean time to repair (hours)
 
@@ -46,8 +46,8 @@ crac_units:
     rated_airflow_cfm: 8000.0       # Rated airflow (CFM)
     min_capacity_pct: 20.0
     max_capacity_pct: 100.0
-    startup_time_s: 180.0
-    shutdown_time_s: 60.0
+    startup_time_s: 30.0            # Startup time (seconds) - reduced for demos
+    shutdown_time_s: 15.0           # Shutdown time (seconds) - reduced for demos
     mtbf_hours: 8760.0
     mttr_hours: 4.0
 
@@ -57,8 +57,8 @@ crac_units:
     rated_airflow_cfm: 8000.0       # Rated airflow (CFM)
     min_capacity_pct: 20.0
     max_capacity_pct: 100.0
-    startup_time_s: 180.0
-    shutdown_time_s: 60.0
+    startup_time_s: 30.0            # Startup time (seconds) - reduced for demos
+    shutdown_time_s: 15.0           # Shutdown time (seconds) - reduced for demos
     mtbf_hours: 8760.0
     mttr_hours: 4.0
 

@@ -2,6 +2,20 @@
 
 A Building Automation System (BAS) simulation for data center cooling. Shows real control strategies, alarms, and testing workflows used in data centers.
 
+## 📋 Quick Navigation
+
+**Professional Documentation:**
+- 📊 [**Commissioning Report**](reports/commissioning.md) - Complete test procedures, validation results, and engineering sign-off
+- 📈 [**Performance Analysis**](#control-performance-analysis) - Live dashboard with KPIs and industry compliance validation  
+- 🎛️ [**System Overview**](#overview) - Architecture, control strategies, and professional features
+- ⚡ [**Quick Start Guide**](#quick-start) - Installation and CLI usage examples
+
+**Engineering Resources:**
+- 🔧 [**Configuration Management**](#configuration-architecture) - YAML configs with schema validation
+- 🚨 [**Alarm Management**](#alarm-management) - Professional BAS alarm handling with priority classification
+- 📊 [**Fault Simulation**](#fault-simulation--diagnostics) - Comprehensive diagnostic engine with root cause analysis
+- 🖥️ [**Node-RED HMI**](#monitoring--hmi) - Interactive dashboard with data center mimic diagram
+
 ## Control Performance Analysis
 
 Built-in analysis tool creates control performance plots and metrics with quantified validation against industry standards.
@@ -141,6 +155,28 @@ flowchart LR
 
 *Modular design with clear separation allows independent testing of thermal dynamics, control algorithms, and monitoring.*
 
+## Live Demo
+
+[![Live Demo](https://img.shields.io/badge/Live-Demo-4B87FF?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMSA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDMgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K)](https://your-demo-url.herokuapp.com)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/miikeyanderson/data-center-bas-sim-main)
+
+**Experience the professional BAS control system with real-time simulation:**
+
+### 📊 Performance Analysis Dashboard
+View live system performance with professional engineering analysis:
+
+| **Temperature Control** | **Equipment Runtime** | **Energy Analysis** | **System Overview** |
+|------------------------|---------------------|-------------------|------------------|
+| ![PID Performance](reports/pid_performance.png) | ![Equipment Runtime](reports/equipment_runtime.png) | ![Energy Performance](reports/energy_performance.png) | ![System Overview](reports/system_overview.png) |
+
+### 🎛️ Interactive HMI Features
+- **Real-time mimic diagram** with data center floor plan and animated airflow
+- **Advanced fault injection** for sensor, actuator, and control system testing  
+- **Role override controls** with individual unit management and maintenance modes
+- **Professional styling** with corporate branding and responsive design
+
+> **Note**: Live demo showcases the enhanced Node-RED HMI with simulated data. For full functionality, deploy locally using the instructions below.
+
 ## Quick Start
 
 **Requirements:** Python 3.8+, Node.js (for HMI)
@@ -167,7 +203,10 @@ python main.py run --config config/default.yaml --scenario crac_failure
 # Override parameters
 python main.py run --config config/default.yaml --set room.it_load_kw=60.0
 
-# Launch enhanced HMI dashboard
+# Launch local demo server (includes enhanced HMI)
+npm start
+
+# Or launch enhanced HMI dashboard directly
 node-red hmi/enhanced-node-red-flows.json
 
 # Or use basic dashboard
@@ -657,6 +696,47 @@ This project implements BAS engineering practices:
 - **Testing Framework**: Auto validation ensures reliable commissioning
 - **Documentation**: Complete technical documentation for operations handover
 - **Version Control**: Git workflow with proper commit standards for change management
+
+## Live Demo Deployment
+
+### Quick Deploy Options
+
+**Option 1: Heroku (Recommended)**
+1. Click the "Deploy to Heroku" button above
+2. Create a Heroku account if needed
+3. Deploy with default settings
+4. Your live demo will be available at `https://your-app-name.herokuapp.com`
+
+**Option 2: Manual Deployment**
+```bash
+# Install dependencies
+npm install
+
+# Start local demo server
+npm start
+
+# Access demo at http://localhost:3000
+# - HMI Dashboard: http://localhost:3000/ui
+# - Flow Editor: http://localhost:3000/red
+```
+
+**Option 3: Railway/Render**
+```bash
+# Connect your GitHub repo to Railway or Render
+# Use these settings:
+# - Build Command: npm install
+# - Start Command: npm start
+# - Port: 3000
+```
+
+### Demo Features Available
+- **Interactive HMI Dashboard** with real-time mimic diagram
+- **Node-RED Flow Editor** for viewing/modifying control logic
+- **Performance Analysis** with live charts and KPIs
+- **Simulated Data** showing realistic BAS operations
+
+### Customization
+Replace `your-demo-url.herokuapp.com` in the README badge with your actual deployment URL after setup.
 
 ## Future Enhancements
 

@@ -42,7 +42,7 @@ This system simulates a typical data center cooling plant with multiple CRAC uni
 
 ```bash
 # Clone and setup
-git clone <repository-url>
+git clone https://github.com/miikeyanderson/data-center-bas-sim-main.git
 cd data-center-bas-sim-main
 pip install -r requirements.txt
 

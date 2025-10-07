@@ -389,248 +389,146 @@ app.get('/ui', (req, res) => {
     <title>BAS Dashboard - Data Center Control System</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Tailwind CSS CDN for ShadCN UI compatibility -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configure Tailwind for ShadCN UI theme -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        border: "hsl(var(--border))",
+                        input: "hsl(var(--input))",
+                        ring: "hsl(var(--ring))",
+                        background: "hsl(var(--background))",
+                        foreground: "hsl(var(--foreground))",
+                        primary: {
+                            DEFAULT: "hsl(var(--primary))",
+                            foreground: "hsl(var(--primary-foreground))",
+                        },
+                        secondary: {
+                            DEFAULT: "hsl(var(--secondary))",
+                            foreground: "hsl(var(--secondary-foreground))",
+                        },
+                        destructive: {
+                            DEFAULT: "hsl(var(--destructive))",
+                            foreground: "hsl(var(--destructive-foreground))",
+                        },
+                        muted: {
+                            DEFAULT: "hsl(var(--muted))",
+                            foreground: "hsl(var(--muted-foreground))",
+                        },
+                        accent: {
+                            DEFAULT: "hsl(var(--accent))",
+                            foreground: "hsl(var(--accent-foreground))",
+                        },
+                        popover: {
+                            DEFAULT: "hsl(var(--popover))",
+                            foreground: "hsl(var(--popover-foreground))",
+                        },
+                        card: {
+                            DEFAULT: "hsl(var(--card))",
+                            foreground: "hsl(var(--card-foreground))",
+                        },
+                    },
+                    borderRadius: {
+                        lg: "var(--radius)",
+                        md: "calc(var(--radius) - 2px)",
+                        sm: "calc(var(--radius) - 4px)",
+                    },
+                }
+            }
+        }
+    </script>
     <style>
+        /* ShadCN UI CSS Variables */
         :root {
-            --card-radius: 16px;
-            --card-shadow: 0 6px 20px rgba(0,0,0,.12);
-            --accent: #4B87FF;
-            --temp-color: #9b59b6;      /* Purple for temperature */
-            --setpoint-color: #3498db;  /* Blue for setpoint */
-            --power-color: #e67e22;     /* Orange for power */
-            --cooling-color: #27ae60;   /* Green for cooling */
-            --cop-color: #7f8c8d;       /* Grey for COP */
-            --alarm-color: #e74c3c;     /* Red for alarms */
-        }
-        
-        body { 
-            font-family: 'Arial', sans-serif; 
-            margin: 0; 
-            background: #f8f9fa; 
-            color: #2c3e50;
-            min-height: 100vh;
-        }
-        
-        .container { 
-            max-width: 1400px; 
-            margin: 0 auto; 
-            padding: 20px; 
-        }
-        
-        .page-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .page-header h1 {
-            color: #2c3e50;
-            font-size: 2.5em;
-            margin: 0 0 8px 0;
-            font-weight: 700;
-        }
-        
-        .page-header p {
-            color: #7f8c8d;
-            font-size: 1.1em;
-            margin: 0;
-        }
-        
-        /* Top KPI Summary Strip */
-        .kpi-strip {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .kpi-tile {
-            background: white;
-            border-radius: var(--card-radius);
-            box-shadow: var(--card-shadow);
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        
-        .kpi-tile:hover {
-            transform: translateY(-2px);
-        }
-        
-        .kpi-tile h2 {
-            margin: 2px 0 0;
-            font-weight: 700;
-            font-size: 2.2em;
-        }
-        
-        .kpi-tile .sub {
-            opacity: 0.7;
-            font-size: 12px;
-            margin-top: 4px;
-        }
-        
-        .kpi-temp-band h2 { color: var(--temp-color); }
-        .kpi-failover h2 { color: var(--setpoint-color); }
-        .kpi-cop h2 { color: var(--cop-color); }
-        .kpi-alarms h2 { color: var(--alarm-color); }
-        
-        /* 2x2 Chart Grid */
-        .chart-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .chart-card {
-            background: white;
-            border-radius: var(--card-radius);
-            box-shadow: var(--card-shadow);
-            padding: 20px;
-        }
-        
-        .chart-card h3 {
-            margin: 0 0 15px 0;
-            font-size: 1.3em;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        
-        .chart-caption {
-            margin-top: 6px;
-            opacity: 0.8;
-            font-size: 12px;
-            color: #7f8c8d;
-        }
-        
-        /* Chart Areas */
-        .chart-area {
-            height: 200px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid #e9ecef;
-        }
-        
-        .chart-placeholder {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #6c757d;
-            font-style: italic;
-        }
-        
-        /* Equipment Cards */
-        .equipment-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-        }
-        
-        .equipment-card {
-            background: white;
-            border-radius: var(--card-radius);
-            box-shadow: var(--card-shadow);
-            padding: 15px;
-            border-left: 4px solid;
-        }
-        
-        .equipment-card.lead { border-left-color: var(--cooling-color); }
-        .equipment-card.lag { border-left-color: var(--setpoint-color); }
-        .equipment-card.standby { border-left-color: var(--cop-color); }
-        
-        .equipment-card h4 {
-            margin: 0 0 10px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .role-badge {
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: bold;
-            color: white;
-        }
-        
-        .role-lead { background: var(--cooling-color); }
-        .role-lag { background: var(--setpoint-color); }
-        .role-standby { background: var(--cop-color); }
-        
-        .metric-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 5px 0;
-            font-size: 13px;
-        }
-        
-        .metric-value {
-            font-weight: 600;
-            color: var(--accent);
-        }
-        
-        /* Engineer Mode Toggle */
-        .engineer-mode {
-            margin: 30px 0;
-        }
-        
-        .engineer-toggle {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-        
-        .engineer-toggle:hover {
-            background: #3d72e6;
-            transform: translateY(-1px);
-        }
-        
-        .engineer-panel {
-            display: none;
-            margin-top: 20px;
-            background: white;
-            border-radius: var(--card-radius);
-            box-shadow: var(--card-shadow);
-            padding: 20px;
-        }
-        
-        .engineer-panel.open {
-            display: block;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .kpi-strip {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            --background: 0 0% 100%;
+            --foreground: 222.2 84% 4.9%;
+            --card: 0 0% 100%;
+            --card-foreground: 222.2 84% 4.9%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 222.2 84% 4.9%;
+            --primary: 221.2 83.2% 53.3%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96%;
+            --secondary-foreground: 222.2 84% 4.9%;
+            --muted: 210 40% 96%;
+            --muted-foreground: 215.4 16.3% 46.9%;
+            --accent: 210 40% 96%;
+            --accent-foreground: 222.2 84% 4.9%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 214.3 31.8% 91.4%;
+            --input: 214.3 31.8% 91.4%;
+            --ring: 221.2 83.2% 53.3%;
+            --radius: 0.5rem;
             
-            .chart-grid {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto;
-            }
-            
-            .equipment-grid {
-                grid-template-columns: 1fr;
-            }
+            /* BAS specific colors */
+            --temp-color: 271 81% 56%;      /* Purple for temperature */
+            --setpoint-color: 221.2 83.2% 53.3%;  /* Blue for setpoint */
+            --power-color: 25 95% 53%;      /* Orange for power */
+            --cooling-color: 142 76% 36%;   /* Green for cooling */
+            --cop-color: 215 16% 47%;       /* Grey for COP */
+            --alarm-color: 0 84% 60%;       /* Red for alarms */
         }
         
-        /* Animation */
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
+        .dark {
+            --background: 222.2 84% 4.9%;
+            --foreground: 210 40% 98%;
+            --card: 222.2 84% 4.9%;
+            --card-foreground: 210 40% 98%;
+            --popover: 222.2 84% 4.9%;
+            --popover-foreground: 210 40% 98%;
+            --primary: 217.2 91.2% 59.8%;
+            --primary-foreground: 222.2 84% 4.9%;
+            --secondary: 217.2 32.6% 17.5%;
+            --secondary-foreground: 210 40% 98%;
+            --muted: 217.2 32.6% 17.5%;
+            --muted-foreground: 215 20.2% 65.1%;
+            --accent: 217.2 32.6% 17.5%;
+            --accent-foreground: 210 40% 98%;
+            --destructive: 0 62.8% 30.6%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 217.2 32.6% 17.5%;
+            --input: 217.2 32.6% 17.5%;
+            --ring: 224.3 76.3% 94.1%;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        * {
+            border-color: hsl(var(--border));
         }
+        
+        body {
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+        }
+        
+        /* Chart canvas styling */
+        .chart-canvas {
+            background: hsl(var(--muted));
+            border-radius: calc(var(--radius) - 2px);
+        }
+        
+        /* Custom BAS color classes */
+        .text-temp { color: hsl(var(--temp-color)); }
+        .text-setpoint { color: hsl(var(--setpoint-color)); }
+        .text-power { color: hsl(var(--power-color)); }
+        .text-cooling { color: hsl(var(--cooling-color)); }
+        .text-cop { color: hsl(var(--cop-color)); }
+        .text-alarm { color: hsl(var(--alarm-color)); }
+        
+        .bg-temp { background-color: hsl(var(--temp-color)); }
+        .bg-setpoint { background-color: hsl(var(--setpoint-color)); }
+        .bg-power { background-color: hsl(var(--power-color)); }
+        .bg-cooling { background-color: hsl(var(--cooling-color)); }
+        .bg-cop { background-color: hsl(var(--cop-color)); }
+        .bg-alarm { background-color: hsl(var(--alarm-color)); }
+        
+        .border-l-temp { border-left-color: hsl(var(--temp-color)); }
+        .border-l-setpoint { border-left-color: hsl(var(--setpoint-color)); }
+        .border-l-cooling { border-left-color: hsl(var(--cooling-color)); }
+        .border-l-cop { border-left-color: hsl(var(--cop-color)); }
     </style>
     <script>
         // Global data storage for charts
@@ -689,7 +587,7 @@ app.get('/ui', (req, res) => {
                 const xStep = width / (maxDataPoints - 1);
                 
                 // Temperature line (purple)
-                tempChart.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--temp-color');
+                tempChart.strokeStyle = 'hsl(271, 81%, 56%)';
                 tempChart.lineWidth = 2;
                 tempChart.beginPath();
                 
@@ -702,7 +600,7 @@ app.get('/ui', (req, res) => {
                 tempChart.stroke();
                 
                 // Setpoint line (blue)
-                tempChart.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--setpoint-color');
+                tempChart.strokeStyle = 'hsl(221.2, 83.2%, 53.3%)';
                 tempChart.lineWidth = 1;
                 tempChart.setLineDash([5, 5]);
                 tempChart.beginPath();
@@ -740,7 +638,7 @@ app.get('/ui', (req, res) => {
                 const maxPower = 60; // Max power scale
                 
                 // Power line (orange)
-                energyChart.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--power-color');
+                energyChart.strokeStyle = 'hsl(25, 95%, 53%)';
                 energyChart.lineWidth = 2;
                 energyChart.beginPath();
                 
@@ -753,7 +651,7 @@ app.get('/ui', (req, res) => {
                 energyChart.stroke();
                 
                 // Cooling line (green)
-                energyChart.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--cooling-color');
+                energyChart.strokeStyle = 'hsl(142, 76%, 36%)';
                 energyChart.lineWidth = 2;
                 energyChart.beginPath();
                 
@@ -859,7 +757,7 @@ app.get('/ui', (req, res) => {
         
         function toggleEngineerMode() {
             const panel = document.getElementById('engineer-panel');
-            panel.classList.toggle('open');
+            panel.classList.toggle('hidden');
         }
         
         // Initialize on load
@@ -871,178 +769,226 @@ app.get('/ui', (req, res) => {
     </script>
 </head>
 <body>
-    <div class="container">
+    <div class="container mx-auto px-4 max-w-7xl">
         <!-- Page Header -->
-        <div class="page-header fade-in">
-            <h1>System Performance Analysis</h1>
-            <p>Data Center Building Automation System - Enterprise Dashboard</p>
+        <div class="text-center mb-8 space-y-2">
+            <h1 class="text-4xl font-bold tracking-tight">System Performance Analysis</h1>
+            <p class="text-xl text-muted-foreground">Data Center Building Automation System - Enterprise Dashboard</p>
         </div>
 
         <!-- Top KPI Summary Strip -->
-        <div class="kpi-strip fade-in">
-            <div class="kpi-tile kpi-temp-band" onclick="scrollToChart('temp-chart')">
-                <div class="sub">Temperature In-Band</div>
-                <h2 id="kpi-temp-band">96.4%</h2>
-                <div class="sub">Within ±0.5°F tolerance</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <!-- Temperature In-Band KPI Card -->
+            <div class="bg-card text-card-foreground rounded-lg border shadow-sm p-6 cursor-pointer transition-all hover:shadow-md hover:-translate-y-1" onclick="scrollToChart('temp-chart')">
+                <div class="text-sm font-medium text-muted-foreground">Temperature In-Band</div>
+                <div class="text-3xl font-bold text-temp" id="kpi-temp-band">96.4%</div>
+                <div class="text-xs text-muted-foreground mt-1">Within ±0.5°F tolerance</div>
             </div>
-            <div class="kpi-tile kpi-failover" onclick="scrollToChart('equipment-chart')">
-                <div class="sub">Failover Time</div>
-                <h2 id="kpi-failover">12.3s</h2>
-                <div class="sub">STANDBY → ACTIVE</div>
+            
+            <!-- Failover Time KPI Card -->
+            <div class="bg-card text-card-foreground rounded-lg border shadow-sm p-6 cursor-pointer transition-all hover:shadow-md hover:-translate-y-1" onclick="scrollToChart('equipment-chart')">
+                <div class="text-sm font-medium text-muted-foreground">Failover Time</div>
+                <div class="text-3xl font-bold text-setpoint" id="kpi-failover">12.3s</div>
+                <div class="text-xs text-muted-foreground mt-1">STANDBY → ACTIVE</div>
             </div>
-            <div class="kpi-tile kpi-cop" onclick="scrollToChart('energy-chart')">
-                <div class="sub">Average COP</div>
-                <h2 id="kpi-cop">3.24</h2>
-                <div class="sub">Energy efficiency ratio</div>
+            
+            <!-- COP KPI Card -->
+            <div class="bg-card text-card-foreground rounded-lg border shadow-sm p-6 cursor-pointer transition-all hover:shadow-md hover:-translate-y-1" onclick="scrollToChart('energy-chart')">
+                <div class="text-sm font-medium text-muted-foreground">Average COP</div>
+                <div class="text-3xl font-bold text-cop" id="kpi-cop">3.24</div>
+                <div class="text-xs text-muted-foreground mt-1">Energy efficiency ratio</div>
             </div>
-            <div class="kpi-tile kpi-alarms" onclick="scrollToChart('equipment-chart')">
-                <div class="sub">Active Alarms</div>
-                <h2 id="kpi-alarms">0</h2>
-                <div class="sub">All systems normal</div>
+            
+            <!-- Alarms KPI Card -->
+            <div class="bg-card text-card-foreground rounded-lg border shadow-sm p-6 cursor-pointer transition-all hover:shadow-md hover:-translate-y-1" onclick="scrollToChart('equipment-chart')">
+                <div class="text-sm font-medium text-muted-foreground">Active Alarms</div>
+                <div class="text-3xl font-bold text-alarm" id="kpi-alarms">0</div>
+                <div class="text-xs text-muted-foreground mt-1">All systems normal</div>
             </div>
         </div>
 
         <!-- 2x2 Chart Grid -->
-        <div class="chart-grid fade-in">
-            <!-- A1: Zone Temperature vs Setpoint -->
-            <div class="chart-card" id="temp-chart">
-                <h3>Zone Temperature vs Setpoint</h3>
-                <div class="chart-area">
-                    <canvas id="temp-canvas" width="800" height="200"></canvas>
-                </div>
-                <div class="chart-caption">
-                    Temperature control within ±0.5°F band. <span id="temp-insight">System stable at setpoint.</span>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- A1: Zone Temperature vs Setpoint (spans 2 columns) -->
+            <div class="lg:col-span-2 bg-card text-card-foreground rounded-lg border shadow-sm" id="temp-chart">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold mb-4">Zone Temperature vs Setpoint</h3>
+                    <div class="h-48 bg-muted rounded-md chart-canvas">
+                        <canvas id="temp-canvas" width="800" height="200" class="w-full h-full"></canvas>
+                    </div>
+                    <p class="text-sm text-muted-foreground mt-2">
+                        Temperature control within ±0.5°F band. <span id="temp-insight" class="font-medium">System stable at setpoint.</span>
+                    </p>
                 </div>
             </div>
             
             <!-- A2: Equipment Utilization -->
-            <div class="chart-card" id="utilization-chart">
-                <h3>Equipment Utilization</h3>
-                <div class="equipment-grid">
-                    <div class="equipment-card lead">
-                        <h4>CRAC-01 <span class="role-badge role-lead">LEAD</span></h4>
-                        <div class="metric-row">
-                            <span>Output:</span>
-                            <span class="metric-value" id="lead-output">65.2%</span>
-                        </div>
-                        <div class="metric-row">
-                            <span>Runtime:</span>
-                            <span class="metric-value" id="lead-runtime">2.4h</span>
-                        </div>
-                    </div>
-                    <div class="equipment-card lag">
-                        <h4>CRAC-02 <span class="role-badge role-lag">LAG</span></h4>
-                        <div class="metric-row">
-                            <span>Output:</span>
-                            <span class="metric-value" id="lag-output">25.0%</span>
-                        </div>
-                        <div class="metric-row">
-                            <span>Starts:</span>
-                            <span class="metric-value" id="lag-starts">3</span>
-                        </div>
-                    </div>
-                    <div class="equipment-card standby">
-                        <h4>CRAC-03 <span class="role-badge role-standby">STANDBY</span></h4>
-                        <div class="metric-row">
-                            <span>Status:</span>
-                            <span class="metric-value">READY</span>
-                        </div>
-                        <div class="metric-row">
-                            <span>Availability:</span>
-                            <span class="metric-value">100%</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="chart-caption">
-                    <span id="staging-events">2 staging events</span> in current session. N+1 redundancy maintained.
-                </div>
-            </div>
-            
-            <!-- B1: Power vs Cooling with COP -->
-            <div class="chart-card" id="energy-chart">
-                <h3>Power vs Cooling with COP</h3>
-                <div class="chart-area">
-                    <canvas id="energy-canvas" width="800" height="200"></canvas>
-                </div>
-                <div class="chart-caption">
-                    System COP: <span id="current-cop">3.24</span>. <span id="energy-insight">Efficiency above Energy Star 2.5 baseline.</span>
-                </div>
-            </div>
-            
-            <!-- B2: Equipment Timeline -->
-            <div class="chart-card" id="timeline-chart">
-                <h3>Equipment Timeline</h3>
-                <div class="chart-area">
-                    <div class="chart-placeholder">
-                        <div style="text-align: center;">
-                            <div style="font-size: 1.2em; margin-bottom: 10px;">System Timeline</div>
-                            <div style="font-size: 0.9em;">
-                                <div style="margin: 5px 0;">
-                                    <span style="color: var(--cooling-color);">●</span> LEAD Active: <span id="timeline-lead">2.4h</span>
+            <div class="bg-card text-card-foreground rounded-lg border shadow-sm" id="utilization-chart">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold mb-4">Equipment Utilization</h3>
+                    <div class="space-y-3">
+                        <!-- CRAC-01 Card -->
+                        <div class="bg-secondary rounded-md p-3 border-l-4 border-l-cooling">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-medium">CRAC-01</h4>
+                                <span class="inline-flex items-center rounded-full bg-cooling px-2 py-1 text-xs font-medium text-white">LEAD</span>
+                            </div>
+                            <div class="space-y-1 text-sm">
+                                <div class="flex justify-between">
+                                    <span>Output:</span>
+                                    <span class="font-medium text-primary" id="lead-output">65.2%</span>
                                 </div>
-                                <div style="margin: 5px 0;">
-                                    <span style="color: var(--setpoint-color);">●</span> LAG Staged: <span id="timeline-lag">0.8h</span>
+                                <div class="flex justify-between">
+                                    <span>Runtime:</span>
+                                    <span class="font-medium text-primary" id="lead-runtime">2.4h</span>
                                 </div>
-                                <div style="margin: 5px 0;">
-                                    <span style="color: var(--cop-color);">●</span> STANDBY Ready: <span id="timeline-standby">2.4h</span>
+                            </div>
+                        </div>
+                        
+                        <!-- CRAC-02 Card -->
+                        <div class="bg-secondary rounded-md p-3 border-l-4 border-l-setpoint">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-medium">CRAC-02</h4>
+                                <span class="inline-flex items-center rounded-full bg-setpoint px-2 py-1 text-xs font-medium text-white">LAG</span>
+                            </div>
+                            <div class="space-y-1 text-sm">
+                                <div class="flex justify-between">
+                                    <span>Output:</span>
+                                    <span class="font-medium text-primary" id="lag-output">25.0%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Starts:</span>
+                                    <span class="font-medium text-primary" id="lag-starts">3</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- CRAC-03 Card -->
+                        <div class="bg-secondary rounded-md p-3 border-l-4 border-l-cop">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-medium">CRAC-03</h4>
+                                <span class="inline-flex items-center rounded-full bg-cop px-2 py-1 text-xs font-medium text-white">STANDBY</span>
+                            </div>
+                            <div class="space-y-1 text-sm">
+                                <div class="flex justify-between">
+                                    <span>Status:</span>
+                                    <span class="font-medium text-primary">READY</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Availability:</span>
+                                    <span class="font-medium text-primary">100%</span>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <p class="text-sm text-muted-foreground mt-4">
+                        <span id="staging-events" class="font-medium">2 staging events</span> in current session. N+1 redundancy maintained.
+                    </p>
                 </div>
-                <div class="chart-caption">
-                    <span id="timeline-insight">No maintenance windows scheduled. All units operational.</span>
+            </div>
+            
+            <!-- B1: Power vs Cooling with COP (spans 2 columns) -->
+            <div class="lg:col-span-2 bg-card text-card-foreground rounded-lg border shadow-sm" id="energy-chart">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold mb-4">Power vs Cooling with COP</h3>
+                    <div class="h-48 bg-muted rounded-md chart-canvas">
+                        <canvas id="energy-canvas" width="800" height="200" class="w-full h-full"></canvas>
+                    </div>
+                    <p class="text-sm text-muted-foreground mt-2">
+                        System COP: <span id="current-cop" class="font-medium text-cop">3.24</span>. <span id="energy-insight" class="font-medium">Efficiency above Energy Star 2.5 baseline.</span>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- B2: Equipment Timeline -->
+            <div class="bg-card text-card-foreground rounded-lg border shadow-sm" id="timeline-chart">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold mb-4">Equipment Timeline</h3>
+                    <div class="h-48 bg-muted rounded-md flex items-center justify-center">
+                        <div class="text-center space-y-4">
+                            <div class="text-lg font-medium">System Timeline</div>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-cooling"></div>
+                                    <span>LEAD Active: <span id="timeline-lead" class="font-medium">2.4h</span></span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-setpoint"></div>
+                                    <span>LAG Staged: <span id="timeline-lag" class="font-medium">0.8h</span></span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-cop"></div>
+                                    <span>STANDBY Ready: <span id="timeline-standby" class="font-medium">2.4h</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-muted-foreground mt-4">
+                        <span id="timeline-insight" class="font-medium">No maintenance windows scheduled. All units operational.</span>
+                    </p>
                 </div>
             </div>
         </div>
 
         <!-- Engineer Mode Section -->
-        <div class="engineer-mode fade-in">
-            <button class="engineer-toggle" onclick="toggleEngineerMode()">
+        <div class="mb-8">
+            <button 
+                class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2" 
+                onclick="toggleEngineerMode()">
                 🔬 Engineer Mode: Advanced Diagnostics
             </button>
-            <div class="engineer-panel" id="engineer-panel">
-                <h3>PID Controller Analysis</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin: 20px 0;">
-                    <div style="text-align: center;">
-                        <h4 style="color: var(--alarm-color);">P-Term</h4>
-                        <div style="font-size: 1.5em; font-weight: bold;" id="p-term">2.1</div>
-                        <div style="font-size: 0.8em; color: #6c757d;">Proportional Response</div>
+            <div class="hidden mt-4 bg-card text-card-foreground rounded-lg border shadow-sm p-6" id="engineer-panel">
+                <h3 class="text-lg font-semibold mb-4">PID Controller Analysis</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="text-center">
+                        <h4 class="text-lg font-medium text-alarm mb-2">P-Term</h4>
+                        <div class="text-2xl font-bold" id="p-term">2.1</div>
+                        <div class="text-sm text-muted-foreground">Proportional Response</div>
                     </div>
-                    <div style="text-align: center;">
-                        <h4 style="color: var(--power-color);">I-Term</h4>
-                        <div style="font-size: 1.5em; font-weight: bold;" id="i-term">-0.3</div>
-                        <div style="font-size: 0.8em; color: #6c757d;">Integral Accumulation</div>
+                    <div class="text-center">
+                        <h4 class="text-lg font-medium text-power mb-2">I-Term</h4>
+                        <div class="text-2xl font-bold" id="i-term">-0.3</div>
+                        <div class="text-sm text-muted-foreground">Integral Accumulation</div>
                     </div>
-                    <div style="text-align: center;">
-                        <h4 style="color: var(--cooling-color);">D-Term</h4>
-                        <div style="font-size: 1.5em; font-weight: bold;" id="d-term">0.1</div>
-                        <div style="font-size: 0.8em; color: #6c757d;">Derivative Action</div>
+                    <div class="text-center">
+                        <h4 class="text-lg font-medium text-cooling mb-2">D-Term</h4>
+                        <div class="text-2xl font-bold" id="d-term">0.1</div>
+                        <div class="text-sm text-muted-foreground">Derivative Action</div>
                     </div>
                 </div>
-                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                    <strong>Controller Status:</strong> <span id="controller-status">Stable operation, no saturation detected</span>
+                <div class="bg-muted rounded-lg p-4">
+                    <span class="font-semibold">Controller Status:</span> 
+                    <span id="controller-status" class="text-muted-foreground">Stable operation, no saturation detected</span>
                 </div>
             </div>
         </div>
 
         <!-- Status Footer -->
-        <div style="margin-top: 40px; padding: 20px; text-align: center; background: white; border-radius: var(--card-radius); box-shadow: var(--card-shadow);">
-            <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap;">
+        <div class="bg-card text-card-foreground rounded-lg border shadow-sm p-6 text-center">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                 <div>
-                    <strong>Simulation Time:</strong> <span id="sim-time" style="font-family: monospace; color: var(--accent);">00:00:00</span>
-                </div>
-                <div>
-                    <strong>Real-time Factor:</strong> <span style="color: var(--accent);">50×</span>
+                    <span class="font-semibold">Simulation Time:</span> 
+                    <span id="sim-time" class="font-mono text-primary">00:00:00</span>
                 </div>
                 <div>
-                    <strong>System Status:</strong> <span style="color: var(--cooling-color);">OPERATIONAL</span>
+                    <span class="font-semibold">Real-time Factor:</span> 
+                    <span class="text-primary">50×</span>
                 </div>
-                <div style="margin-top: 10px;">
-                    <a href="/red" style="margin: 0 10px; color: var(--accent); text-decoration: none;">🔧 Flow Editor</a>
-                    <a href="/" style="margin: 0 10px; color: var(--accent); text-decoration: none;">🏠 Home</a>
-                    <a href="https://github.com/miikeyanderson/data-center-bas-sim-main" style="margin: 0 10px; color: var(--accent); text-decoration: none;">📁 Source</a>
+                <div>
+                    <span class="font-semibold">System Status:</span> 
+                    <span class="text-cooling font-medium">OPERATIONAL</span>
                 </div>
+            </div>
+            <div class="flex flex-wrap justify-center gap-4 mt-4 pt-4 border-t">
+                <a href="/red" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                    🔧 Flow Editor
+                </a>
+                <a href="/" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                    🏠 Home
+                </a>
+                <a href="https://github.com/miikeyanderson/data-center-bas-sim-main" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                    📁 Source
+                </a>
             </div>
         </div>
     </div>

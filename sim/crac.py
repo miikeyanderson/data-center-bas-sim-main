@@ -23,6 +23,7 @@ class CRACConfig:
     Engineering parameters:
     - q_rated_kw: Nominal cooling capacity at design conditions (kW)
     - efficiency_cop: Coefficient of Performance (cooling_kw / power_kw)
+    - rated_airflow_cfm: Nominal airflow at design conditions (CFM)
     - min_capacity_pct: Minimum stable output (% of rated)
     - startup_time_s: Time to reach full capacity from OFF (seconds)
     - shutdown_time_s: Time to completely stop from RUNNING (seconds)
@@ -30,6 +31,7 @@ class CRACConfig:
     unit_id: str = "CRAC-01"
     q_rated_kw: float = 50.0         # Rated cooling capacity (kW)
     efficiency_cop: float = 3.5      # Coefficient of Performance
+    rated_airflow_cfm: float = 8000.0  # Rated airflow (CFM)
 
     min_capacity_pct: float = 20.0   # Minimum stable output (%)
     max_capacity_pct: float = 100.0  # Maximum output (%)
@@ -71,6 +73,7 @@ class CRACUnit:
         self.status: CRACStatus = CRACStatus.OFF
         self.q_cool_kw: float = 0.0      # Actual cooling output (kW)
         self.power_kw: float = 0.0       # Electrical power consumption (kW)
+        self.airflow_cfm: float = 0.0    # Current airflow (CFM)
         self.availability: float = 1.0   # Availability factor (0-1)
 
         # Timing state
@@ -113,6 +116,9 @@ class CRACUnit:
 
         # Calculate cooling output based on current status
         self._calculate_cooling_output()
+
+        # Calculate airflow based on current status
+        self._calculate_airflow()
 
         # Calculate power consumption
         self._calculate_power_consumption()
@@ -190,6 +196,24 @@ class CRACUnit:
             # No cooling when OFF, STOPPING, or FAILED
             self.q_cool_kw = 0.0
 
+    def _calculate_airflow(self) -> None:
+        """Calculate actual airflow based on status and command."""
+        if self.status == CRACStatus.RUNNING:
+            # Airflow tracks cooling capacity percentage
+            capacity_fraction = self.cmd_pct / 100.0
+            self.airflow_cfm = (capacity_fraction * self.cfg.rated_airflow_cfm *
+                               self.availability)
+        elif self.status == CRACStatus.STARTING:
+            # Partial airflow during startup
+            startup_progress = 1.0 - (self.transition_timer_s /
+                                     self.cfg.startup_time_s)
+            capacity_fraction = (self.cmd_pct / 100.0) * startup_progress
+            self.airflow_cfm = (capacity_fraction * self.cfg.rated_airflow_cfm *
+                               self.availability)
+        else:
+            # No airflow when OFF, STOPPING, or FAILED
+            self.airflow_cfm = 0.0
+
     def _calculate_power_consumption(self) -> None:
         """Calculate electrical power consumption."""
         if self.q_cool_kw > 0 and self.cfg.efficiency_cop > 0:
@@ -231,6 +255,7 @@ class CRACUnit:
             'cmd_pct': self.cmd_pct,
             'q_cool_kw': self.q_cool_kw,
             'power_kw': self.power_kw,
+            'airflow_cfm': self.airflow_cfm,
             'availability': self.availability,
             'failed': self.failed,
             'runtime_hours': self.runtime_hours,
@@ -239,5 +264,6 @@ class CRACUnit:
             'transition_timer_s': self.transition_timer_s,
             'next_failure_hours': self.next_failure_hours,
             'efficiency_cop': self.cfg.efficiency_cop,
-            'q_rated_kw': self.cfg.q_rated_kw
+            'q_rated_kw': self.cfg.q_rated_kw,
+            'rated_airflow_cfm': self.cfg.rated_airflow_cfm
         }

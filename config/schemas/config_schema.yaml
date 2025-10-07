@@ -298,4 +298,169 @@ properties:
         default: 24.0
         description: "Data retention period (hours)"
 
+  bacnet:
+    type: object
+    properties:
+      enabled:
+        type: boolean
+        default: false
+        description: "Enable BACnet/IP interface"
+      device:
+        type: object
+        required: [objectName, objectIdentifier]
+        properties:
+          objectName:
+            type: string
+            pattern: "^[A-Za-z0-9_-]+$"
+            maxLength: 64
+            description: "BACnet device object name"
+          objectIdentifier:
+            type: integer
+            minimum: 1
+            maximum: 4194303
+            description: "BACnet device instance number (1-4194303)"
+          vendorIdentifier:
+            type: integer
+            minimum: 0
+            maximum: 65535
+            default: 15
+            description: "BACnet vendor identifier (15 = Other)"
+          maxApduLengthAccepted:
+            type: integer
+            minimum: 50
+            maximum: 1476
+            default: 1024
+            description: "Maximum APDU length accepted (bytes)"
+          segmentationSupported:
+            type: string
+            enum: ["segmented-both", "segmented-transmit", "segmented-receive", "no-segmentation"]
+            default: "segmented-both"
+            description: "BACnet segmentation support level"
+          modelName:
+            type: string
+            maxLength: 64
+            default: "DC-BAS-Simulation"
+            description: "Device model name"
+          firmwareRevision:
+            type: string
+            maxLength: 32
+            default: "1.0.0"
+            description: "Firmware revision string"
+          applicationSoftwareVersion:
+            type: string
+            maxLength: 32
+            default: "1.0.0"
+            description: "Application software version"
+      network:
+        type: object
+        properties:
+          bind:
+            type: string
+            format: ipv4
+            default: "0.0.0.0"
+            description: "IP address to bind to (0.0.0.0 for all interfaces)"
+          port:
+            type: integer
+            minimum: 1024
+            maximum: 65535
+            default: 47808
+            description: "UDP port for BACnet/IP communication"
+          bbmdAddress:
+            type: string
+            format: ipv4
+            description: "BBMD (BACnet Broadcast Management Device) IP address"
+          bbmdPort:
+            type: integer
+            minimum: 1024
+            maximum: 65535
+            default: 47808
+            description: "BBMD UDP port"
+          foreignDeviceTtl:
+            type: integer
+            minimum: 1
+            maximum: 65535
+            default: 300
+            description: "Foreign device registration TTL (seconds)"
+      points:
+        type: object
+        properties:
+          zone_temp_ai:
+            type: integer
+            minimum: 1
+            maximum: 4194303
+            default: 1
+            description: "Zone temperature analog input instance"
+          zone_temp_setpoint_av:
+            type: integer
+            minimum: 1
+            maximum: 4194303
+            default: 2
+            description: "Zone temperature setpoint analog value instance"
+          crac1_cmd_ao:
+            type: integer
+            minimum: 1
+            maximum: 4194303
+            default: 3
+            description: "CRAC-01 command analog output instance"
+          crac1_status_bi:
+            type: integer
+            minimum: 1
+            maximum: 4194303
+            default: 4
+            description: "CRAC-01 status binary input instance"
+          crac1_cooling_ai:
+            type: integer
+            minimum: 1
+            maximum: 4194303
+            default: 5
+            description: "CRAC-01 cooling output analog input instance"
+          crac2_cmd_ao:
+            type: integer
+            minimum: 1
+            maximum: 4194303
+            default: 6
+            description: "CRAC-02 command analog output instance"
+          crac2_status_bi:
+            type: integer
+            minimum: 1
+            maximum: 4194303
+            default: 7
+            description: "CRAC-02 status binary input instance"
+          crac2_cooling_ai:
+            type: integer
+            minimum: 1
+            maximum: 4194303
+            default: 8
+            description: "CRAC-02 cooling output analog input instance"
+          crac3_cmd_ao:
+            type: integer
+            minimum: 1
+            maximum: 4194303
+            default: 9
+            description: "CRAC-03 command analog output instance"
+          crac3_status_bi:
+            type: integer
+            minimum: 1
+            maximum: 4194303
+            default: 10
+            description: "CRAC-03 status binary input instance"
+          crac3_cooling_ai:
+            type: integer
+            minimum: 1
+            maximum: 4194303
+            default: 11
+            description: "CRAC-03 cooling output analog input instance"
+          system_alarm_bo:
+            type: integer
+            minimum: 1
+            maximum: 4194303
+            default: 12
+            description: "System alarm binary output instance"
+          it_load_ai:
+            type: integer
+            minimum: 1
+            maximum: 4194303
+            default: 13
+            description: "IT load analog input instance"
+
 additionalProperties: false

@@ -37,8 +37,23 @@ from sim.crac import CRACUnit, CRACConfig
 from control.pid import PIDController, PIDConfig
 from control.sequences import CRACSequencer, StagingConfig
 
+# Professional BAS formatting utilities
+from utils.formatting import (
+    format_time_hms, format_temperature_dual, format_airflow, 
+    format_power, format_runtime_professional
+)
 
-def create_system_from_config(config: Dict[str, Any]) -> tuple[Room, PIDController, CRACSequencer]:
+# BACnet integration (optional)
+try:
+    from interfaces.bacnet import BACnetShim
+    BACNET_AVAILABLE = True
+except ImportError as e:
+    BACNET_AVAILABLE = False
+    # Only print if BACnet is actually requested
+    # print(f"⚠️  BACnet integration not available: {e}")
+
+
+def create_system_from_config(config: Dict[str, Any]) -> tuple[Room, PIDController, CRACSequencer, Optional[object]]:
     """
     Create BAS simulation system from configuration.
     
@@ -46,7 +61,7 @@ def create_system_from_config(config: Dict[str, Any]) -> tuple[Room, PIDControll
         config: Validated configuration dictionary
         
     Returns:
-        Tuple of (room, pid_controller, crac_sequencer)
+        Tuple of (room, pid_controller, crac_sequencer, bacnet_shim)
     """
     # Create room from config
     room_cfg = RoomConfig(**config['room'])
@@ -66,7 +81,26 @@ def create_system_from_config(config: Dict[str, Any]) -> tuple[Room, PIDControll
     staging_cfg = StagingConfig(**config.get('staging_config', {}))
     sequencer = CRACSequencer(cracs, staging_cfg)
     
-    return room, pid, sequencer
+    # Create BACnet integration if enabled
+    bacnet_shim = None
+    if config.get('bacnet', {}).get('enabled', False) and BACNET_AVAILABLE:
+        try:
+            print("🌐 Starting BACnet/IP interface...")
+            bacnet_shim = BACnetShim(
+                config['bacnet'],
+                temp_callback=lambda: room.temp_c,
+                cmd_setter=lambda cmd, pri: sequencer.set_external_command(cmd, pri) if hasattr(sequencer, 'set_external_command') else None
+            )
+            bacnet_shim.start_async()
+            print(f"✅ BACnet/IP active - Device {config['bacnet']['device']['objectIdentifier']} on port {config['bacnet']['network']['port']}")
+        except Exception as e:
+            print(f"⚠️  BACnet startup failed: {e}")
+            print("   Continuing simulation without BACnet...")
+            bacnet_shim = None
+    elif config.get('bacnet', {}).get('enabled', False):
+        print("⚠️  BACnet enabled but bacpypes not installed")
+    
+    return room, pid, sequencer, bacnet_shim
 
 
 def run_simulation(config: Dict[str, Any]) -> Dict[str, Any]:
@@ -80,7 +114,7 @@ def run_simulation(config: Dict[str, Any]) -> Dict[str, Any]:
         Simulation results dictionary
     """
     print(f"🏗️  Creating BAS system from configuration...")
-    room, pid, sequencer = create_system_from_config(config)
+    room, pid, sequencer, bacnet_shim = create_system_from_config(config)
     
     # Simulation parameters from config
     sim_config = config['simulation']
@@ -98,7 +132,7 @@ def run_simulation(config: Dict[str, Any]) -> Dict[str, Any]:
     crac_states: List[dict] = []
     
     print(f"🚀 Starting {duration_minutes:.1f} minute simulation")
-    print(f"📊 Setpoint: {setpoint_c:.1f}°C, Timestep: {timestep_s:.1f}s")
+    print(f"📊 Setpoint: {format_temperature_dual(setpoint_c)}, Timestep: {timestep_s:.1f}s")
     print("=" * 60)
     
     start_time = time.time()
@@ -129,9 +163,9 @@ def run_simulation(config: Dict[str, Any]) -> Dict[str, Any]:
             total_power = sequencer.get_total_power_kw()
             
             print(f"⏱️  {elapsed_min:5.1f}m | "
-                  f"🌡️  {room.temp_c:5.2f}°C | "
-                  f"❄️  {total_cooling_kw:5.1f}kW | "
-                  f"⚡ {total_power:5.1f}kW | "
+                  f"🌡️  {format_temperature_dual(room.temp_c, False):>12} | "
+                  f"❄️  {format_power(total_cooling_kw):>8} | "
+                  f"⚡ {format_power(total_power):>8} | "
                   f"📊 {pid_output:5.1f}% | "
                   f"🎯 ±{temp_error:.2f}°C")
         
@@ -320,9 +354,14 @@ Examples:
   %(prog)s run --config config/default.yaml
   %(prog)s run --config config/default.yaml --scenario high_load
   %(prog)s run --config config/default.yaml --set room.it_load_kw=60.0
+  %(prog)s run --config config/default.yaml --enable-bacnet --device-id 100
   %(prog)s validate --config config/custom.yaml
   %(prog)s benchmark --config config/default.yaml --duration 30
   %(prog)s export --config config/default.yaml --format csv
+
+BACnet Integration Examples:
+  %(prog)s run --enable-bacnet --bacnet-port 47809 --device-name "Test-BAS"
+  %(prog)s run --scenario bacnet_interop --enable-bacnet
         """
     )
     
@@ -338,6 +377,20 @@ Examples:
                            help='Override config parameter (e.g., --set room.temp=25.0)')
     run_parser.add_argument('--export', choices=['csv', 'json'],
                            help='Export results to specified format')
+    
+    # BACnet/IP Integration flags
+    bacnet_group = run_parser.add_argument_group('BACnet/IP Options', 
+                                                 'Professional building automation protocol integration')
+    bacnet_group.add_argument('--enable-bacnet', action='store_true',
+                             help='Enable BACnet/IP interface for integration testing')
+    bacnet_group.add_argument('--bacnet-port', type=int, metavar='PORT',
+                             help='Override BACnet/IP UDP port (default: 47808)')
+    bacnet_group.add_argument('--device-id', type=int, metavar='ID',
+                             help='Override BACnet device instance ID (1-4194303)')
+    bacnet_group.add_argument('--bacnet-bind', type=str, metavar='IP',
+                             help='IP address to bind BACnet interface (default: 0.0.0.0)')
+    bacnet_group.add_argument('--device-name', type=str, metavar='NAME',
+                             help='Override BACnet device object name')
     
     # Validate command
     validate_parser = subparsers.add_parser('validate', help='Validate configuration file')
@@ -377,12 +430,49 @@ Examples:
     # Run command
     elif args.command == 'run':
         try:
+            # Process BACnet CLI flags into configuration overrides
+            bacnet_overrides = []
+            if hasattr(args, 'enable_bacnet') and args.enable_bacnet:
+                bacnet_overrides.append('bacnet.enabled=true')
+            if hasattr(args, 'bacnet_port') and args.bacnet_port is not None:
+                # Validate port range
+                if not (1024 <= args.bacnet_port <= 65535):
+                    print(f"❌ Invalid BACnet port: {args.bacnet_port} (must be 1024-65535)")
+                    return 1
+                bacnet_overrides.append(f'bacnet.network.port={args.bacnet_port}')
+            if hasattr(args, 'device_id') and args.device_id is not None:
+                # Validate device ID range
+                if not (1 <= args.device_id <= 4194303):
+                    print(f"❌ Invalid BACnet device ID: {args.device_id} (must be 1-4194303)")
+                    return 1
+                bacnet_overrides.append(f'bacnet.device.objectIdentifier={args.device_id}')
+            if hasattr(args, 'bacnet_bind') and args.bacnet_bind is not None:
+                bacnet_overrides.append(f'bacnet.network.bind={args.bacnet_bind}')
+            if hasattr(args, 'device_name') and args.device_name is not None:
+                # Validate device name format
+                import re
+                if not re.match(r'^[A-Za-z0-9_-]+$', args.device_name) or len(args.device_name) > 64:
+                    print(f"❌ Invalid BACnet device name: {args.device_name} (alphanumeric, underscore, hyphen only, max 64 chars)")
+                    return 1
+                bacnet_overrides.append(f'bacnet.device.objectName={args.device_name}')
+            
+            # Combine all overrides
+            all_overrides = (args.overrides or []) + bacnet_overrides
+            
             # Load configuration with overrides
             config = load_config_with_overrides(
                 args.config,
                 scenario=args.scenario,
-                cli_overrides=args.overrides or []
+                cli_overrides=all_overrides
             )
+            
+            # Display BACnet status if enabled
+            if config.get('bacnet', {}).get('enabled', False):
+                bacnet_config = config['bacnet']
+                print(f"🌐 BACnet/IP Interface: ENABLED")
+                print(f"   Device: {bacnet_config['device']['objectName']} (ID: {bacnet_config['device']['objectIdentifier']})")
+                print(f"   Network: {bacnet_config['network']['bind']}:{bacnet_config['network']['port']}")
+                print()
             
             print("🏭 Data Center BAS Simulation Platform")
             print("=" * 60)

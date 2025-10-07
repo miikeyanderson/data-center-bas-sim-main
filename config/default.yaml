@@ -11,15 +11,15 @@ room:
   initial_temp_c: 22.0              # Initial room temperature (°C)
   ambient_temp_c: 22.0              # Ambient/outside temperature (°C)
   thermal_mass_kj_per_c: 2500.0     # Thermal mass (kJ/°C) - medium data center
-  ua_kw_per_c: 0.25                 # Envelope heat transfer coefficient (kW/°C)
+  ua_kw_per_c: 0.08                 # Envelope heat transfer coefficient (kW/°C) - optimized for demos
   it_load_kw: 40.0                  # IT server load (kW)
   infil_ua_kw_per_c: 0.0            # Infiltration heat transfer (kW/°C)
   n_virtual_sensors: 3              # Number of virtual temperature sensors
 
 # PID Controller Configuration
 pid_controller:
-  kp: 3.0                           # Proportional gain (%/°C) - aggressive for data center
-  ki: 0.15                          # Integral gain (%/(°C·s)) - moderate
+  kp: 8.0                           # Proportional gain (%/°C) - tuned for optimal response
+  ki: 0.3                           # Integral gain (%/(°C·s)) - improved steady-state
   kd: 0.08                          # Derivative gain (%/(°C/s)) - light
   output_min: 0.0                   # Minimum output (%)
   output_max: 100.0                 # Maximum output (%)
@@ -90,3 +90,46 @@ telemetry:
   enable_real_time_display: true    # Enable real-time console output
   csv_output_path: "reports/"       # CSV output directory
   data_retention_hours: 24.0        # Data retention period (hours)
+
+# BACnet/IP Configuration
+# Professional building automation protocol integration
+bacnet:
+  enabled: false                    # BACnet/IP interface disabled by default
+  device:
+    objectName: "DC-BAS-Sim"         # BACnet device name (must be unique on network)
+    objectIdentifier: 599            # Device instance number (1-4194303)
+    vendorIdentifier: 15             # Vendor ID (15 = Other/Open Source)
+    maxApduLengthAccepted: 1024      # Maximum APDU length (bytes)
+    segmentationSupported: "segmented-both"  # Full segmentation support
+    modelName: "DC-BAS-Simulation"   # Device model identifier
+    firmwareRevision: "1.0.0"        # Firmware version string
+    applicationSoftwareVersion: "1.0.0"  # Application version
+  network:
+    bind: "0.0.0.0"                 # Bind to all network interfaces
+    port: 47808                      # Standard BACnet/IP UDP port
+    # bbmdAddress: "192.168.1.100"   # BBMD IP (uncomment if using BBMD)
+    # bbmdPort: 47808                # BBMD port
+    foreignDeviceTtl: 300            # Foreign device registration TTL (seconds)
+  points:
+    # Analog Inputs (AI) - Read-only sensor values
+    zone_temp_ai: 1                  # Zone temperature sensor (°C)
+    crac1_cooling_ai: 5              # CRAC-01 cooling output (kW)
+    crac2_cooling_ai: 8              # CRAC-02 cooling output (kW)
+    crac3_cooling_ai: 11             # CRAC-03 cooling output (kW)
+    it_load_ai: 13                   # IT equipment load (kW)
+    
+    # Analog Values (AV) - Read/write setpoints
+    zone_temp_setpoint_av: 2         # Temperature setpoint (°C)
+    
+    # Analog Outputs (AO) - Control commands
+    crac1_cmd_ao: 3                  # CRAC-01 capacity command (%)
+    crac2_cmd_ao: 6                  # CRAC-02 capacity command (%)
+    crac3_cmd_ao: 9                  # CRAC-03 capacity command (%)
+    
+    # Binary Inputs (BI) - Status feedback
+    crac1_status_bi: 4               # CRAC-01 running status
+    crac2_status_bi: 7               # CRAC-02 running status
+    crac3_status_bi: 10              # CRAC-03 running status
+    
+    # Binary Outputs (BO) - Alarm/status outputs
+    system_alarm_bo: 12              # System alarm status

@@ -331,7 +331,10 @@ flowchart LR
   Ops --> Sim
   
   subgraph Telemetry
-    T[Temperature], Pwr[Power], Role[CRAC Role], Al[Alarms]
+    T[Temperature]
+    Pwr[Power]
+    Role[CRAC Role]
+    Al[Alarms]
   end
   
   Sim --> T
@@ -340,7 +343,9 @@ flowchart LR
   Sim --> Al
   
   subgraph Interfaces
-    HTTP[HTTP API], WS[WebSocket], MQTT[MQTT]
+    HTTP[HTTP API]
+    WS[WebSocket]
+    MQTT[MQTT]
   end
   
   HMI --> HTTP

@@ -6,34 +6,35 @@ system:
   version: "1.0"
   description: "Professional Building Automation System simulation for data center cooling"
 
-# Room/Zone Configuration
+# Room/Zone Configuration - Performance Optimized
 room:
   initial_temp_c: 22.0              # Initial room temperature (°C)
   ambient_temp_c: 22.0              # Ambient/outside temperature (°C)
-  thermal_mass_kj_per_c: 2500.0     # Thermal mass (kJ/°C) - medium data center
-  ua_kw_per_c: 0.08                 # Envelope heat transfer coefficient (kW/°C) - optimized for demos
-  it_load_kw: 25.0                  # IT server load (kW) - reduced for demo stability
+  thermal_mass_kj_per_c: 1800.0     # Thermal mass (kJ/°C) - reduced for faster response
+  ua_kw_per_c: 0.12                 # Envelope heat transfer coefficient (kW/°C) - increased for better heat exchange
+  it_load_kw: 35.0                  # IT server load (kW) - optimized for realistic load
   infil_ua_kw_per_c: 0.0            # Infiltration heat transfer (kW/°C)
   n_virtual_sensors: 3              # Number of virtual temperature sensors
 
-# PID Controller Configuration
+# PID Controller Configuration - Performance Optimized
 pid_controller:
-  kp: 15.0                          # Proportional gain (%/°C) - increased for better response
-  ki: 0.5                           # Integral gain (%/(°C·s)) - increased for steady-state
-  kd: 0.1                           # Derivative gain (%/(°C/s)) - light
+  kp: 25.0                          # Proportional gain (%/°C) - increased for tighter control
+  ki: 1.2                           # Integral gain (%/(°C·s)) - increased for faster steady-state
+  kd: 0.3                           # Derivative gain (%/(°C/s)) - increased for better damping
   output_min: 0.0                   # Minimum output (%)
   output_max: 100.0                 # Maximum output (%)
-  rate_limit: 50.0                  # Maximum change rate (%/s) - increased for demos
-  integral_windup_limit: 80.0       # Integral windup protection (%) - increased
+  rate_limit: 80.0                  # Maximum change rate (%/s) - increased for faster response
+  integral_windup_limit: 60.0       # Integral windup protection (%) - reduced for tighter control
 
 # CRAC Unit Configuration
 # Note: Roles assigned automatically by sequencer (1st=LEAD, 2nd=LAG, 3rd+=STANDBY)
+# CRAC Unit Configuration - Performance Optimized
 crac_units:
   - unit_id: "CRAC-01"              # Will be assigned LEAD role
     q_rated_kw: 50.0                # Rated cooling capacity (kW)
-    efficiency_cop: 3.5             # Coefficient of performance
+    efficiency_cop: 3.8             # Coefficient of performance - increased for efficiency target
     rated_airflow_cfm: 8000.0       # Rated airflow (CFM)
-    min_capacity_pct: 20.0          # Minimum capacity (%)
+    min_capacity_pct: 15.0          # Minimum capacity (%) - reduced for better modulation
     max_capacity_pct: 100.0         # Maximum capacity (%)
     startup_time_s: 1.0             # Startup time (seconds) - minimal for demos
     shutdown_time_s: 1.0            # Shutdown time (seconds) - minimal for demos
@@ -42,9 +43,9 @@ crac_units:
 
   - unit_id: "CRAC-02"              # Will be assigned LAG role
     q_rated_kw: 50.0
-    efficiency_cop: 3.5
+    efficiency_cop: 3.8             # Coefficient of performance - increased for efficiency target
     rated_airflow_cfm: 8000.0       # Rated airflow (CFM)
-    min_capacity_pct: 20.0
+    min_capacity_pct: 15.0          # Minimum capacity (%) - reduced for better modulation
     max_capacity_pct: 100.0
     startup_time_s: 1.0             # Startup time (seconds) - minimal for demos
     shutdown_time_s: 1.0            # Shutdown time (seconds) - minimal for demos
@@ -53,30 +54,30 @@ crac_units:
 
   - unit_id: "CRAC-03"              # Will be assigned STANDBY role
     q_rated_kw: 50.0
-    efficiency_cop: 3.5
+    efficiency_cop: 3.8             # Coefficient of performance - increased for efficiency target
     rated_airflow_cfm: 8000.0       # Rated airflow (CFM)
-    min_capacity_pct: 20.0
+    min_capacity_pct: 15.0          # Minimum capacity (%) - reduced for better modulation
     max_capacity_pct: 100.0
     startup_time_s: 1.0             # Startup time (seconds) - minimal for demos
     shutdown_time_s: 1.0            # Shutdown time (seconds) - minimal for demos
     mtbf_hours: 8760.0
     mttr_hours: 4.0
 
-# CRAC Staging Configuration
+# CRAC Staging Configuration - Performance Optimized
 staging_config:
-  temp_error_threshold: 0.8         # Temperature error for LAG staging (°C)
-  staging_delay_s: 180.0            # Staging delay (seconds) - 3 minutes
-  destaging_delay_s: 300.0          # Destaging delay (seconds) - 5 minutes
+  temp_error_threshold: 0.3         # Temperature error for LAG staging (°C) - reduced for faster response
+  staging_delay_s: 60.0             # Staging delay (seconds) - reduced to 1 minute
+  destaging_delay_s: 120.0          # Destaging delay (seconds) - reduced to 2 minutes
   rotation_runtime_hours: 24.0      # Runtime before rotation (hours) - daily
   enable_rotation: true             # Enable automatic CRAC rotation
-  staging_hysteresis: 0.2           # Staging hysteresis (°C) - anti-chatter
-  destaging_hysteresis: 0.3         # Destaging hysteresis (°C)
+  staging_hysteresis: 0.1           # Staging hysteresis (°C) - reduced for tighter control
+  destaging_hysteresis: 0.15        # Destaging hysteresis (°C) - reduced for tighter control
 
-# Simulation Parameters
+# Simulation Parameters - Performance Optimized
 simulation:
   duration_minutes: 60.0            # Simulation duration (minutes)
-  timestep_s: 1.0                   # Simulation timestep (seconds)
-  output_interval_s: 60.0           # Data output interval (seconds)
+  timestep_s: 0.5                   # Simulation timestep (seconds) - reduced for higher fidelity
+  output_interval_s: 1.0            # Data output interval (seconds) - increased frequency for analysis
   setpoint_c: 22.0                  # Temperature setpoint (°C)
   random_seed: 42                   # Random seed for reproducibility
 

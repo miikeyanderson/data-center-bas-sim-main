@@ -199,6 +199,12 @@ app.get('/', (req, res) => {
             100% { opacity: 1; }
         }
         
+        /* Fan Spin Animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
         /* Industrial Typography */
         .data-value {
             font-family: 'Courier New', monospace;
@@ -571,15 +577,20 @@ app.get('/ui', (req, res) => {
             tempChart.fillStyle = '#f8f9fa';
             tempChart.fillRect(0, 0, width, height);
             
-            // Draw setpoint band (±0.5°F)
+            // Calculate dynamic scaling based on actual data range
             const setpoint = 72.0;
-            const yScale = height / 4; // 4°F range (70-74°F)
-            const yOffset = height / 2;
+            const temps = tempData.map(d => d.temp);
+            const minTemp = Math.min(...temps, setpoint - 1);
+            const maxTemp = Math.max(...temps, setpoint + 1);
+            const tempRange = Math.max(2.0, maxTemp - minTemp + 0.5); // Minimum 2°F range
+            const yScale = height / tempRange;
+            const yOffset = height - (minTemp - (minTemp - 0.25)) * yScale;
             
-            // Setpoint band
+            // Setpoint band (±0.5°F)
             tempChart.fillStyle = 'rgba(52, 152, 219, 0.1)';
-            const bandTop = yOffset - (0.5 * yScale / 2);
-            const bandHeight = yScale / 2;
+            const setpointY = height - (setpoint - minTemp + 0.25) * yScale;
+            const bandTop = setpointY - (0.5 * yScale);
+            const bandHeight = 1.0 * yScale; // ±0.5°F band
             tempChart.fillRect(0, bandTop, width, bandHeight);
             
             // Draw data lines
@@ -593,7 +604,7 @@ app.get('/ui', (req, res) => {
                 
                 tempData.forEach((point, i) => {
                     const x = i * xStep;
-                    const y = yOffset - ((point.temp - setpoint) * yScale / 2);
+                    const y = height - (point.temp - minTemp + 0.25) * yScale;
                     if (i === 0) tempChart.moveTo(x, y);
                     else tempChart.lineTo(x, y);
                 });
@@ -604,18 +615,19 @@ app.get('/ui', (req, res) => {
                 tempChart.lineWidth = 1;
                 tempChart.setLineDash([5, 5]);
                 tempChart.beginPath();
-                tempChart.moveTo(0, yOffset);
-                tempChart.lineTo(width, yOffset);
+                const setpointLineY = height - (setpoint - minTemp + 0.25) * yScale;
+                tempChart.moveTo(0, setpointLineY);
+                tempChart.lineTo(width, setpointLineY);
                 tempChart.stroke();
                 tempChart.setLineDash([]);
             }
             
-            // Draw axis labels
+            // Draw dynamic axis labels
             tempChart.fillStyle = '#6c757d';
             tempChart.font = '12px Arial';
-            tempChart.fillText('74°F', 10, 20);
-            tempChart.fillText('72°F', 10, height/2);
-            tempChart.fillText('70°F', 10, height - 10);
+            tempChart.fillText(maxTemp.toFixed(1) + '°F', 10, 20);
+            tempChart.fillText(setpoint.toFixed(1) + '°F', 10, setpointLineY + 5);
+            tempChart.fillText(minTemp.toFixed(1) + '°F', 10, height - 10);
         }
         
         // Draw energy chart
@@ -635,7 +647,12 @@ app.get('/ui', (req, res) => {
             
             if (energyData.length > 1) {
                 const xStep = width / (maxDataPoints - 1);
-                const maxPower = 60; // Max power scale
+                
+                // Calculate dynamic scaling based on actual data range
+                const powers = energyData.map(d => d.power);
+                const coolings = energyData.map(d => d.cooling);
+                const maxPower = Math.max(...powers) * 1.1; // 10% headroom
+                const maxCooling = Math.max(...coolings) * 1.1;
                 
                 // Power line (orange)
                 energyChart.strokeStyle = 'hsl(25, 95%, 53%)';
@@ -657,20 +674,114 @@ app.get('/ui', (req, res) => {
                 
                 energyData.forEach((point, i) => {
                     const x = i * xStep;
-                    const y = height - (point.cooling / (maxPower * 3) * height); // Cooling is ~3x power
+                    const y = height - (point.cooling / maxCooling * height);
                     if (i === 0) energyChart.moveTo(x, y);
                     else energyChart.lineTo(x, y);
                 });
                 energyChart.stroke();
             }
             
-            // Draw axis labels
+            // Draw dynamic axis labels
             energyChart.fillStyle = '#6c757d';
             energyChart.font = '12px Arial';
-            energyChart.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--power-color');
-            energyChart.fillText('Power', 10, 20);
-            energyChart.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--cooling-color');
-            energyChart.fillText('Cooling', 10, 35);
+            energyChart.fillStyle = 'hsl(25, 95%, 53%)'; // Power color
+            energyChart.fillText('Power: ' + maxPower.toFixed(0) + 'kW max', 10, 20);
+            energyChart.fillStyle = 'hsl(142, 76%, 36%)'; // Cooling color
+            energyChart.fillText('Cooling: ' + maxCooling.toFixed(0) + 'kW max', 10, 35);
+        }
+        
+        // Update fan animations and RPM displays
+        function updateFanAnimations(leadPct, lagOn) {
+            // Calculate RPM for each CRAC based on output percentage
+            const crac01Rpm = Math.round((leadPct / 100) * 1500 + 200); // 200-1700 RPM range
+            const crac02Rpm = lagOn ? Math.round(800 + Math.random() * 200) : 0; // 800-1000 RPM when on
+            const crac03Rpm = 0; // Standby unit
+            
+            // Calculate valve positions (cooling coil damper positions)
+            const crac01ValvePct = leadPct;
+            const crac02ValvePct = lagOn ? Math.round(25 + Math.random() * 30) : 0; // 25-55% when on
+            const crac03ValvePct = 0; // Standby
+            
+            // Update RPM displays
+            const rpm01 = document.getElementById('crac-01-rpm');
+            const rpm02 = document.getElementById('crac-02-rpm');
+            const rpm03 = document.getElementById('crac-03-rpm');
+            
+            if (rpm01) rpm01.textContent = crac01Rpm;
+            if (rpm02) rpm02.textContent = crac02Rpm;
+            if (rpm03) rpm03.textContent = crac03Rpm;
+            
+            // Update valve position displays and animations
+            updateValvePositions(crac01ValvePct, crac02ValvePct, crac03ValvePct);
+            
+            // Calculate rotation speeds (degrees per second)
+            const crac01Speed = (crac01Rpm / 60) * 360; // RPM to degrees per second
+            const crac02Speed = (crac02Rpm / 60) * 360;
+            const crac03Speed = 0;
+            
+            // Apply rotation animations to fan blades
+            animateFanBlades('crac-01-blades', crac01Speed);
+            animateFanBlades('crac-02-blades', crac02Speed);
+            animateFanBlades('crac-03-blades', crac03Speed);
+        }
+        
+        // Animate fan blades with CSS transforms
+        function animateFanBlades(bladeId, degreesPerSecond) {
+            const fanBlades = document.getElementById(bladeId);
+            if (!fanBlades) return;
+            
+            if (degreesPerSecond > 0) {
+                const rotationDuration = 360 / degreesPerSecond; // seconds for full rotation
+                fanBlades.style.animation = 'spin ' + rotationDuration.toFixed(2) + 's linear infinite';
+            } else {
+                fanBlades.style.animation = 'none';
+            }
+        }
+        
+        // Update valve positions and animations
+        function updateValvePositions(crac01Pct, crac02Pct, crac03Pct) {
+            // Update CRAC-01 valve
+            updateValveIndicator('crac-01-valve-pos', 'crac-01-valve-pct', crac01Pct, 30);
+            
+            // Update CRAC-02 valve
+            updateValveIndicator('crac-02-valve-pos', 'crac-02-valve-pct', crac02Pct, 20);
+            
+            // Update CRAC-03 valve
+            updateValveIndicator('crac-03-valve-pos', 'crac-03-valve-pct', crac03Pct, 30);
+        }
+        
+        // Update individual valve indicator
+        function updateValveIndicator(valvePosId, valvePctId, percentage, maxHeight) {
+            const valvePos = document.getElementById(valvePosId);
+            const valvePct = document.getElementById(valvePctId);
+            
+            if (valvePos) {
+                const height = (percentage / 100) * maxHeight;
+                const yPosition = valvePos.getAttribute('y').replace(/\d+/, function(match) {
+                    return parseInt(match) + maxHeight - height;
+                });
+                
+                // Clear existing animations
+                valvePos.innerHTML = '';
+                
+                // Set new height and position
+                valvePos.setAttribute('height', height);
+                valvePos.setAttribute('y', yPosition);
+                
+                // Add subtle animation for active valves
+                if (percentage > 0) {
+                    const animate1 = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+                    animate1.setAttribute('attributeName', 'opacity');
+                    animate1.setAttribute('values', '0.7;1;0.7');
+                    animate1.setAttribute('dur', '2s');
+                    animate1.setAttribute('repeatCount', 'indefinite');
+                    valvePos.appendChild(animate1);
+                }
+            }
+            
+            if (valvePct) {
+                valvePct.textContent = percentage + '%';
+            }
         }
         
         // Update floorplan with real-time data
@@ -748,6 +859,9 @@ app.get('/ui', (req, res) => {
                 crac03.querySelector('.status-indicator').setAttribute('fill', '#bdc3c7');
             }
             
+            // Update fan speeds and animations
+            updateFanAnimations(leadPct, lagOn);
+            
             // Update floorplan summary metrics
             const avgTemp = rackTemps.reduce((sum, temp) => sum + temp, 0) / rackTemps.length;
             const totalAirflow = 8000 + (lagOn ? 8000 : 0); // CFM per CRAC
@@ -803,6 +917,40 @@ app.get('/ui', (req, res) => {
             });
         }
         
+        // Dynamic insight generation functions
+        function generateTemperatureInsight(error, temp, setpoint, lead_pct, lag_on) {
+            const absError = Math.abs(error);
+            const currentTime = new Date().toLocaleTimeString();
+            
+            if (absError < 0.1) {
+                return 'Temperature control within ±0.1°F band. Excellent stability. Updated: ' + currentTime;
+            } else if (absError < 0.3) {
+                return 'Temperature control within ±0.5°F band. Current: ' + temp.toFixed(1) + '°F. Updated: ' + currentTime;
+            } else if (absError < 0.7) {
+                return error > 0 ? 
+                    'Zone running ' + error.toFixed(1) + '°F above setpoint. CRAC response at ' + lead_pct.toFixed(0) + '%. Updated: ' + currentTime :
+                    'Zone running ' + Math.abs(error).toFixed(1) + '°F below setpoint. Reducing cooling output. Updated: ' + currentTime;
+            } else {
+                return error > 0 ?
+                    'HIGH DEVIATION: +' + error.toFixed(1) + '°F above setpoint. ' + (lag_on ? 'Lag unit staging.' : 'Increasing lead output.') + ' Updated: ' + currentTime :
+                    'Temperature significantly below setpoint. Minimum cooling engaged. Updated: ' + currentTime;
+            }
+        }
+        
+        function generateEnergyInsight(cop, power, cooling, lead_pct) {
+            const currentTime = new Date().toLocaleTimeString();
+            
+            if (cop > 3.2) {
+                return 'System COP: ' + cop.toFixed(2) + '. Efficiency above baseline (' + (((cop - 2.5) / 2.5) * 100).toFixed(0) + '% better). Updated: ' + currentTime;
+            } else if (cop > 2.8) {
+                return 'System COP: ' + cop.toFixed(2) + '. Efficiency within normal range. Power: ' + power.toFixed(1) + 'kW. Updated: ' + currentTime;
+            } else if (cop > 2.3) {
+                return 'System COP: ' + cop.toFixed(2) + '. Below optimal efficiency. Consider maintenance check. Updated: ' + currentTime;
+            } else {
+                return 'LOW EFFICIENCY: COP ' + cop.toFixed(2) + '. Immediate maintenance required. Power: ' + power.toFixed(1) + 'kW. Updated: ' + currentTime;
+            }
+        }
+        
         // Simulate live data updates
         function updateLiveData() {
             const now = Date.now();
@@ -826,6 +974,49 @@ app.get('/ui', (req, res) => {
             const power = lead_pct * 0.6 + (lag_on ? 15 : 0);
             const cooling = power * cop;
             
+            // Enhanced airflow and valve position parameters for backend
+            const airflowData = {
+                crac01: {
+                    cfm: 8000 * (lead_pct / 100),
+                    velocity_fpm: 450 + (lead_pct / 100) * 350, // 450-800 FPM
+                    static_pressure_iwc: 0.5 + (lead_pct / 100) * 0.3, // 0.5-0.8 inches WC
+                    differential_pressure_iwc: 0.1 + (lead_pct / 100) * 0.15, // Across filters
+                    fan_power_kw: 1.2 + (lead_pct / 100) * 3.8, // 1.2-5.0 kW
+                    valve_position_pct: lead_pct,
+                    coil_leaving_temp_f: 55 + (1 - lead_pct / 100) * 5, // 50-60°F
+                    coil_entering_temp_f: temp + 5 // Return air + heat pickup
+                },
+                crac02: {
+                    cfm: lag_on ? 8000 * 0.4 : 0, // 40% when staging
+                    velocity_fpm: lag_on ? 580 : 0,
+                    static_pressure_iwc: lag_on ? 0.65 : 0,
+                    differential_pressure_iwc: lag_on ? 0.18 : 0,
+                    fan_power_kw: lag_on ? 3.2 : 0.1, // Standby power
+                    valve_position_pct: lag_on ? 40 : 0,
+                    coil_leaving_temp_f: lag_on ? 57 : temp,
+                    coil_entering_temp_f: lag_on ? temp + 4 : temp
+                },
+                crac03: {
+                    cfm: 0, // Standby
+                    velocity_fpm: 0,
+                    static_pressure_iwc: 0,
+                    differential_pressure_iwc: 0,
+                    fan_power_kw: 0.1, // Standby power only
+                    valve_position_pct: 0,
+                    coil_leaving_temp_f: temp, // Ambient
+                    coil_entering_temp_f: temp
+                },
+                total: {
+                    cfm: 8000 * (lead_pct / 100) + (lag_on ? 3200 : 0),
+                    air_changes_per_hour: (8000 * (lead_pct / 100) + (lag_on ? 3200 : 0)) / 833, // Assuming 50,000 ft³ room
+                    mixed_air_temp_f: temp + 2, // Return air temperature
+                    supply_air_temp_f: 55 + Math.random() * 3 // 55-58°F range
+                }
+            };
+            
+            // Store airflow data for potential API access or logging
+            window.currentAirflowData = airflowData;
+            
             // Update KPI tiles
             const inBand = Math.abs(error) < 0.5 ? 100 : 85 + Math.random() * 10;
             document.getElementById('kpi-temp-band').textContent = inBand.toFixed(1) + '%';
@@ -839,11 +1030,12 @@ app.get('/ui', (req, res) => {
             document.getElementById('lag-output').textContent = lag_on ? '25.0%' : '0.0%';
             document.getElementById('lag-starts').textContent = lag_on ? '3' : '2';
             
-            // Update chart insights
-            document.getElementById('temp-insight').textContent = 
-                Math.abs(error) < 0.2 ? 'System stable at setpoint.' : 'Minor temperature deviation, correcting.';
-            document.getElementById('energy-insight').textContent = 
-                cop > 3.0 ? 'Efficiency above Energy Star 2.5 baseline.' : 'Efficiency within normal range.';
+            // Generate dynamic, contextual chart insights
+            const tempInsight = generateTemperatureInsight(error, temp, setpoint, lead_pct, lag_on);
+            const energyInsight = generateEnergyInsight(cop, power, cooling, lead_pct);
+            
+            document.getElementById('temp-insight').textContent = tempInsight;
+            document.getElementById('energy-insight').textContent = energyInsight;
             document.getElementById('current-cop').textContent = cop.toFixed(2);
             
             // Update timeline
@@ -858,7 +1050,7 @@ app.get('/ui', (req, res) => {
             document.getElementById('controller-status').textContent = 
                 lead_pct > 95 ? 'High output, approaching saturation' : 'Stable operation, no saturation detected';
             
-            // Update time
+            // Update time and data status
             const hours = Math.floor(t / 3600);
             const minutes = Math.floor((t % 3600) / 60);
             const seconds = Math.floor(t % 60);
@@ -866,6 +1058,18 @@ app.get('/ui', (req, res) => {
                 hours.toString().padStart(2, '0') + ':' +
                 minutes.toString().padStart(2, '0') + ':' +
                 seconds.toString().padStart(2, '0');
+            
+            // Update data status indicator
+            const currentTimeStamp = new Date().toLocaleTimeString();
+            document.getElementById('data-status').textContent = 'LIVE';
+            document.getElementById('last-update').textContent = 'Last Update: ' + currentTimeStamp;
+            
+            // Flash data status indicator to show active updates
+            const dataStatus = document.getElementById('data-status');
+            dataStatus.style.color = '#22c55e'; // Green
+            setTimeout(() => {
+                dataStatus.style.color = '#10b981'; // Slightly dimmer green
+            }, 100);
             
             // Store data for charts
             tempData.push({ temp, setpoint, time: t });
@@ -1042,6 +1246,26 @@ app.get('/ui', (req, res) => {
                             <circle cx="45" cy="225" r="6" fill="#a3f7a3" class="status-indicator">
                                 <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
                             </circle>
+                            <!-- Fan indicator -->
+                            <g id="crac-01-fan" class="fan-indicator">
+                                <circle cx="30" cy="170" r="8" fill="none" stroke="#ffffff" stroke-width="1"/>
+                                <g id="crac-01-blades" transform-origin="30 170">
+                                    <path d="M 30,162 L 30,178 M 22,170 L 38,170" stroke="#ffffff" stroke-width="2"/>
+                                    <path d="M 24,164 L 36,176 M 24,176 L 36,164" stroke="#ffffff" stroke-width="1"/>
+                                </g>
+                                <text id="crac-01-rpm" x="30" y="185" text-anchor="middle" class="text-xs fill-white">1200</text>
+                                <text x="30" y="195" text-anchor="middle" class="text-xs fill-white">RPM</text>
+                            </g>
+                            <!-- Valve position indicator -->
+                            <g id="crac-01-valve" class="valve-indicator">
+                                <rect x="50" y="165" width="15" height="30" fill="none" stroke="#ffffff" stroke-width="1" rx="2"/>
+                                <rect id="crac-01-valve-pos" x="51" y="185" width="13" height="0" fill="#a3f7a3">
+                                    <animate attributeName="height" values="0;9;0" dur="3s" repeatCount="indefinite"/>
+                                    <animate attributeName="y" values="185;176;185" dur="3s" repeatCount="indefinite"/>
+                                </rect>
+                                <text id="crac-01-valve-pct" x="57" y="175" text-anchor="middle" class="text-xs fill-white">75%</text>
+                                <text x="57" y="205" text-anchor="middle" class="text-xs fill-white">Valve</text>
+                            </g>
                             <!-- Airflow arrows -->
                             <path d="M 70 180 L 80 180 M 75 175 L 80 180 L 75 185" stroke="#ffffff" stroke-width="2" fill="none"/>
                             <path d="M 70 200 L 80 200 M 75 195 L 80 200 L 75 205" stroke="#ffffff" stroke-width="2" fill="none"/>
@@ -1054,6 +1278,26 @@ app.get('/ui', (req, res) => {
                             <text x="400" y="368" text-anchor="middle" class="text-xs fill-white font-bold">CRAC-02</text>
                             <text x="400" y="380" text-anchor="middle" class="text-xs fill-white">LAG</text>
                             <circle cx="385" cy="385" r="4" fill="#5dade2"/>
+                            <!-- Fan indicator -->
+                            <g id="crac-02-fan" class="fan-indicator">
+                                <circle cx="410" cy="360" r="6" fill="none" stroke="#ffffff" stroke-width="1"/>
+                                <g id="crac-02-blades" transform-origin="410 360">
+                                    <path d="M 410,355 L 410,365 M 405,360 L 415,360" stroke="#ffffff" stroke-width="1.5"/>
+                                    <path d="M 407,357 L 413,363 M 407,363 L 413,357" stroke="#ffffff" stroke-width="1"/>
+                                </g>
+                                <text id="crac-02-rpm" x="410" y="375" text-anchor="middle" class="text-xs fill-white">800</text>
+                                <text x="410" y="385" text-anchor="middle" class="text-xs fill-white">RPM</text>
+                            </g>
+                            <!-- Valve position indicator -->
+                            <g id="crac-02-valve" class="valve-indicator">
+                                <rect x="380" y="355" width="10" height="20" fill="none" stroke="#ffffff" stroke-width="1" rx="1"/>
+                                <rect id="crac-02-valve-pos" x="381" y="370" width="8" height="0" fill="#5dade2">
+                                    <animate attributeName="height" values="0;14;0" dur="4s" repeatCount="indefinite"/>
+                                    <animate attributeName="y" values="370;356;370" dur="4s" repeatCount="indefinite"/>
+                                </rect>
+                                <text id="crac-02-valve-pct" x="385" y="350" text-anchor="middle" class="text-xs fill-white">45%</text>
+                                <text x="385" y="380" text-anchor="middle" class="text-xs fill-white">Valve</text>
+                            </g>
                             <!-- Airflow arrows -->
                             <path d="M 390 340 L 390 350 M 385 345 L 390 350 L 395 345" stroke="#3498db" stroke-width="2" fill="none"/>
                             <path d="M 400 340 L 400 350 M 395 345 L 400 350 L 405 345" stroke="#3498db" stroke-width="2" fill="none"/>
@@ -1067,6 +1311,23 @@ app.get('/ui', (req, res) => {
                             <text x="755" y="200" text-anchor="middle" class="text-xs fill-white font-bold">03</text>
                             <text x="755" y="215" text-anchor="middle" class="text-xs fill-white">STANDBY</text>
                             <circle cx="755" cy="225" r="6" fill="#bdc3c7" class="status-indicator"/>
+                            <!-- Fan indicator -->
+                            <g id="crac-03-fan" class="fan-indicator">
+                                <circle cx="740" cy="170" r="8" fill="none" stroke="#ffffff" stroke-width="1"/>
+                                <g id="crac-03-blades" transform-origin="740 170">
+                                    <path d="M 740,162 L 740,178 M 732,170 L 748,170" stroke="#ffffff" stroke-width="2"/>
+                                    <path d="M 734,164 L 746,176 M 734,176 L 746,164" stroke="#ffffff" stroke-width="1"/>
+                                </g>
+                                <text id="crac-03-rpm" x="740" y="185" text-anchor="middle" class="text-xs fill-white">0</text>
+                                <text x="740" y="195" text-anchor="middle" class="text-xs fill-white">RPM</text>
+                            </g>
+                            <!-- Valve position indicator -->
+                            <g id="crac-03-valve" class="valve-indicator">
+                                <rect x="750" y="165" width="15" height="30" fill="none" stroke="#ffffff" stroke-width="1" rx="2"/>
+                                <rect id="crac-03-valve-pos" x="751" y="190" width="13" height="0" fill="#bdc3c7"/>
+                                <text id="crac-03-valve-pct" x="757" y="175" text-anchor="middle" class="text-xs fill-white">0%</text>
+                                <text x="757" y="205" text-anchor="middle" class="text-xs fill-white">Valve</text>
+                            </g>
                         </g>
                         
                         <!-- Temperature Legend -->
@@ -1269,7 +1530,7 @@ app.get('/ui', (req, res) => {
 
         <!-- Status Footer -->
         <div class="bg-card text-card-foreground rounded-lg border shadow-sm p-6 text-center">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-center">
                 <div>
                     <span class="font-semibold">Simulation Time:</span> 
                     <span id="sim-time" class="font-mono text-primary">00:00:00</span>
@@ -1279,9 +1540,16 @@ app.get('/ui', (req, res) => {
                     <span class="text-primary">50×</span>
                 </div>
                 <div>
+                    <span class="font-semibold">Data Status:</span> 
+                    <span id="data-status" class="font-bold text-green-500">LIVE</span>
+                </div>
+                <div>
                     <span class="font-semibold">System Status:</span> 
                     <span class="text-cooling font-medium">OPERATIONAL</span>
                 </div>
+            </div>
+            <div class="mt-3 pt-3 border-t">
+                <span id="last-update" class="text-sm text-muted-foreground">Last Update: --:--:--</span>
             </div>
             <div class="flex flex-wrap justify-center gap-4 mt-4 pt-4 border-t">
                 <a href="/red" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">

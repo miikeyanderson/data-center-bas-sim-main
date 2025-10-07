@@ -137,14 +137,26 @@ def run_simulation(config: Dict[str, Any]) -> Dict[str, Any]:
     
     start_time = time.time()
     
+    # Calculate feedforward term to balance steady-state IT load  
+    # Estimate: each CRAC unit provides rated capacity at 100%, so IT_load/total_capacity * 100%
+    total_crac_capacity = sum(assignment.unit.cfg.q_rated_kw for assignment in sequencer.assignments)
+    feedforward_output = (room.it_load_kw / total_crac_capacity) * 100.0
+    feedforward_output = min(95.0, max(5.0, feedforward_output))  # Reasonable bounds
+    
+    print(f"🧠 Feedforward control: {feedforward_output:.1f}% base cooling for {room.it_load_kw:.1f}kW IT load")
+    
     for step in range(total_steps):
         sim_time = step * timestep_s
         
         # PID control calculation
         pid_output = pid.update(setpoint_c, room.temp_c, timestep_s)
         
-        # CRAC sequencer update
-        sequencer.update(timestep_s, setpoint_c, room.temp_c, pid_output)
+        # Add feedforward term to PID output
+        total_output = pid_output + feedforward_output
+        total_output = min(100.0, max(0.0, total_output))  # Clamp to valid range
+        
+        # CRAC sequencer update with feedforward + PID
+        sequencer.update(timestep_s, setpoint_c, room.temp_c, total_output)
         
         # Get total cooling from all CRACs
         total_cooling_kw = sequencer.get_total_cooling_kw()
@@ -166,7 +178,7 @@ def run_simulation(config: Dict[str, Any]) -> Dict[str, Any]:
                   f"🌡️  {format_temperature_dual(room.temp_c, False):>12} | "
                   f"❄️  {format_power(total_cooling_kw):>8} | "
                   f"⚡ {format_power(total_power):>8} | "
-                  f"📊 {pid_output:5.1f}% | "
+                  f"📊 {total_output:5.1f}% | "
                   f"🎯 ±{temp_error:.2f}°C")
         
         # Collect detailed data at output interval
@@ -176,7 +188,7 @@ def run_simulation(config: Dict[str, Any]) -> Dict[str, Any]:
                 'time_min': sim_time / 60.0,
                 'temp_c': room.temp_c,
                 'setpoint_c': setpoint_c,
-                'pid_output_pct': pid_output,
+                'pid_output_pct': total_output,
                 'total_cooling_kw': total_cooling_kw,
                 'total_power_kw': sequencer.get_total_power_kw(),
                 'lag_staged': system_state['lag_staged'],
@@ -226,18 +238,42 @@ def run_simulation(config: Dict[str, Any]) -> Dict[str, Any]:
               f"{assignment['cmd_pct']:.1f}% | "
               f"{format_power(assignment['q_cool_kw'])}")
     
-    # Test criteria evaluation
+    # Performance criteria evaluation - Documentation Claims Standards
     print()
-    print("📋 PERFORMANCE CRITERIA:")
-    temp_pass = avg_error <= 2.4 and temp_std <= 3.0  # More realistic for demos
-    control_pass = control_accuracy >= 2.0  # More achievable target
-    efficiency_pass = avg_cooling > 0
+    print("📋 PERFORMANCE CRITERIA (DOCUMENTATION STANDARDS):")
+    
+    # Calculate steady-state performance (exclude first 5 minutes for convergence)
+    steady_state_start = int(5 * 60 / timestep_s)  # 5 minutes
+    if len(temperatures) > steady_state_start:
+        steady_temps = temperatures[steady_state_start:]
+        steady_errors = [abs(t - setpoint_c) for t in steady_temps]
+        steady_in_range = sum(1 for e in steady_errors if e <= 0.5)
+        steady_accuracy = (steady_in_range / len(steady_errors)) * 100 if steady_errors else 0
+        steady_avg_error = statistics.mean(steady_errors) if steady_errors else avg_error
+        steady_std = statistics.stdev(steady_temps) if len(steady_temps) > 1 else temp_std
+    else:
+        steady_accuracy = control_accuracy
+        steady_avg_error = avg_error  
+        steady_std = temp_std
+    
+    # Calculate COP efficiency
+    total_power_data = [sequencer.get_total_power_kw() for _ in range(len(cooling_outputs))]
+    cops = [cooling/power if power > 0 else 0 for cooling, power in zip(cooling_outputs, total_power_data)]
+    avg_cop = statistics.mean(cops) if cops else 0
+    
+    # Documentation-level criteria
+    temp_pass = steady_avg_error <= 0.5 and steady_std <= 0.3  # Tight control per documentation
+    control_pass = steady_accuracy >= 95.0  # 95.8% target from documentation
+    efficiency_pass = avg_cop >= 2.9  # COP 2.94 target from documentation
     
     print(f"   Temperature Control: {'✅ PASS' if temp_pass else '❌ FAIL'} "
-          f"(avg error ≤ 2.4°C, std dev ≤ 3.0°C)")
+          f"(steady-state avg error ≤ 0.5°C, std dev ≤ 0.3°C)")
     print(f"   Control Accuracy: {'✅ PASS' if control_pass else '❌ FAIL'} "
-          f"({control_accuracy:.1f}% ≥ 2.0%)")
-    print(f"   System Efficiency: {'✅ PASS' if efficiency_pass else '❌ FAIL'}")
+          f"(steady-state: {steady_accuracy:.1f}% ≥ 95.0%)")
+    print(f"   Energy Efficiency: {'✅ PASS' if efficiency_pass else '❌ FAIL'} "
+          f"(COP: {avg_cop:.2f} ≥ 2.90)")
+    print(f"   Steady-state Analysis: {len(steady_temps) if 'steady_temps' in locals() else 0} samples "
+          f"({(len(steady_temps) if 'steady_temps' in locals() else 0) / len(temperatures) * 100:.1f}% of simulation)")
     
     overall_pass = temp_pass and control_pass and efficiency_pass
     print(f"\n🏆 OVERALL: {'✅ PASS' if overall_pass else '❌ FAIL'}")

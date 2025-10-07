@@ -298,86 +298,6 @@ node-red hmi/enhanced-node-red-flows.json
 node-red hmi/node-red-flows.json
 ```
 
-## Configuration
-
-### CLI Interface
-
-The simulation provides a command-line interface with commands:
-
-```bash
-# Config validation
-python main.py validate --config config/custom.yaml
-
-# Run simulation  
-python main.py run --config config/default.yaml [options]
-
-# Performance testing
-python main.py benchmark --config config/default.yaml --duration 30
-
-# Config export
-python main.py export --config config/default.yaml --format yaml
-```
-
-### YAML Configuration
-
-All system parameters use YAML files:
-
-**Master Configuration** (`config/default.yaml`):
-```yaml
-system:
-  name: "Data Center BAS Simulation"
-  version: "1.0"
-
-room:
-  initial_temp_c: 22.0
-  it_load_kw: 40.0
-  thermal_mass_kj_per_c: 2500.0
-
-pid_controller:
-  kp: 3.0
-  ki: 0.15
-  kd: 0.08
-
-crac_units:
-  - unit_id: "CRAC-01"     # Auto-assigned LEAD role
-    q_rated_kw: 50.0
-    efficiency_cop: 3.5
-  - unit_id: "CRAC-02"     # Auto-assigned LAG role  
-    q_rated_kw: 50.0
-  - unit_id: "CRAC-03"     # Auto-assigned STANDBY role
-    q_rated_kw: 50.0
-
-simulation:
-  duration_minutes: 60.0
-  timestep_s: 1.0
-  setpoint_c: 22.0
-```
-
-### Scenario Override System
-
-Test scenarios are defined as YAML files that override base configuration:
-
-**Rising Load Scenario** (`config/scenarios/rising_load.yaml`):
-```yaml
-simulation:
-  duration_minutes: 15.0
-
-room:
-  it_load_kw: 35.0  # Starting load
-
-load_profile:
-  type: "ramp"
-  start_load_kw: 35.0
-  end_load_kw: 70.0
-```
-
-### Schema Validation
-
-All configurations are validated against JSON schemas ensuring:
-- Type safety and value ranges
-- Required parameter checking  
-- Clear error reporting
-- Configuration consistency
 
 ## Control System Features
 
@@ -819,28 +739,72 @@ data-center-bas-sim-main/
 
 ## Configuration
 
-### File Organization
+### Schema Validation
 
-**Base Configuration** (`config/default.yaml`):
-- System definition with all required parameters
-- Production-ready defaults for typical data center operation
-- Schema-validated for consistency and correctness
-
-**Scenario Overrides** (`config/scenarios/*.yaml`):
-- Test-specific parameter changes
-- Separation of test conditions from base system
-- Configuration inheritance for maintainability
-
-**Schema Validation** (`config/schemas/config_schema.yaml`):
-- Validation rules for all parameters
-- Type checking, range validation, and dependency verification
+All configurations are validated against JSON schemas (`config/schemas/config_schema.yaml`) ensuring:
+- Type safety and value ranges
+- Required parameter checking  
 - Clear error reporting for configuration issues
 
-### CLI Parameter Overrides
+### Default YAML Configuration
 
-Runtime parameter changes without editing configuration files:
+**Base Configuration** (`config/default.yaml`):
+```yaml
+system:
+  name: "Data Center BAS Simulation"
+  version: "1.0"
+
+room:
+  initial_temp_c: 22.0
+  it_load_kw: 40.0
+  thermal_mass_kj_per_c: 2500.0
+
+pid_controller:
+  kp: 3.0
+  ki: 0.15
+  kd: 0.08
+
+crac_units:
+  - unit_id: "CRAC-01"     # Auto-assigned LEAD role
+    q_rated_kw: 50.0
+    efficiency_cop: 3.5
+  - unit_id: "CRAC-02"     # Auto-assigned LAG role  
+    q_rated_kw: 50.0
+  - unit_id: "CRAC-03"     # Auto-assigned STANDBY role
+    q_rated_kw: 50.0
+
+simulation:
+  duration_minutes: 60.0
+  timestep_s: 1.0
+  setpoint_c: 22.0
+```
+
+### Scenario Overrides
+
+Test scenarios override base configuration (`config/scenarios/*.yaml`):
+
+**Rising Load Scenario** (`config/scenarios/rising_load.yaml`):
+```yaml
+simulation:
+  duration_minutes: 15.0
+
+room:
+  it_load_kw: 35.0  # Starting load
+
+load_profile:
+  type: "ramp"
+  start_load_kw: 35.0
+  end_load_kw: 70.0
+```
+
+### CLI Overrides
+
+Runtime parameter changes without editing files:
 
 ```bash
+# Config validation
+python main.py validate --config config/custom.yaml
+
 # Single parameter override
 python main.py run --config config/default.yaml --set room.it_load_kw=80.0
 
@@ -849,6 +813,9 @@ python main.py run --config config/default.yaml \
     --set room.it_load_kw=60.0 \
     --set pid_controller.kp=4.0 \
     --set simulation.duration_minutes=30
+
+# Performance testing
+python main.py benchmark --config config/default.yaml --duration 30
 ```
 
 ## Commissioning Documentation

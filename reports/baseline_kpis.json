@@ -1,0 +1,45 @@
+{
+  "simulation": {
+    "duration_hours": 0.015277777777777777,
+    "timestep_seconds": 5.0,
+    "samples": 12
+  },
+  "temperature": {
+    "setpoint_c": 22.0,
+    "avg_temp_c": 22.083333333333332,
+    "std_dev_c": 0.2289634084831949,
+    "max_error_c": 0.5,
+    "avg_error_c": 0.18333333333333357,
+    "control_accuracy_pct": 100.0
+  },
+  "equipment": {
+    "runtime": {
+      "crac_1": {
+        "hours": 0.016666666666666666,
+        "percentage": 109.09090909090908
+      },
+      "crac_2": {
+        "hours": 0.002777777777777778,
+        "percentage": 18.181818181818183
+      },
+      "crac_3": {
+        "hours": 0.0,
+        "percentage": 0.0
+      }
+    },
+    "switching": {
+      "crac_1": 0,
+      "crac_2": 1,
+      "crac_3": 0
+    }
+  },
+  "energy": {
+    "total_cooling_kwh": 0.47625,
+    "avg_power_kw": 9.666666666666666,
+    "avg_cooling_kw": 28.575,
+    "avg_cop": 2.9374999999999996
+  },
+  "control": {
+    "saturation_pct": 0.0
+  }
+}

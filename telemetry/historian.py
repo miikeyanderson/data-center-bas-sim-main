@@ -145,9 +145,9 @@ class CSVHistorian:
             "sensor_1_c", "sensor_2_c", "sensor_3_c", "sensor_4_c", "sensor_5_c",
             
             # CRAC data (up to 3 units)
-            "crac_1_id", "crac_1_status", "crac_1_cmd_pct", "crac_1_cool_kw", "crac_1_power_kw",
-            "crac_2_id", "crac_2_status", "crac_2_cmd_pct", "crac_2_cool_kw", "crac_2_power_kw", 
-            "crac_3_id", "crac_3_status", "crac_3_cmd_pct", "crac_3_cool_kw", "crac_3_power_kw",
+            "crac_1_id", "crac_1_status", "crac_1_cmd_pct", "crac_1_cool_kw", "crac_1_power_kw", "crac_1_airflow_cfm",
+            "crac_2_id", "crac_2_status", "crac_2_cmd_pct", "crac_2_cool_kw", "crac_2_power_kw", "crac_2_airflow_cfm",
+            "crac_3_id", "crac_3_status", "crac_3_cmd_pct", "crac_3_cool_kw", "crac_3_power_kw", "crac_3_airflow_cfm",
             
             # System totals
             "total_cooling_kw", "total_power_kw", "energy_efficiency_cop",
@@ -223,10 +223,11 @@ class CSVHistorian:
                     crac.get('status', 'off'),
                     f"{crac.get('cmd_pct', 0.0):.1f}",
                     f"{crac.get('q_cool_kw', 0.0):.1f}",
-                    f"{crac.get('power_kw', 0.0):.1f}"
+                    f"{crac.get('power_kw', 0.0):.1f}",
+                    f"{crac.get('airflow_cfm', 0.0):.0f}"
                 ])
             else:
-                row_data.extend(["", "", "0.0", "0.0", "0.0"])
+                row_data.extend(["", "", "0.0", "0.0", "0.0", "0.0"])
         
         # System totals
         total_cooling = sum(c.get('q_cool_kw', 0.0) for c in crac_data)

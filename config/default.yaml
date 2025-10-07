@@ -32,6 +32,7 @@ crac_units:
   - unit_id: "CRAC-01"              # Will be assigned LEAD role
     q_rated_kw: 50.0                # Rated cooling capacity (kW)
     efficiency_cop: 3.5             # Coefficient of performance
+    rated_airflow_cfm: 8000.0       # Rated airflow (CFM)
     min_capacity_pct: 20.0          # Minimum capacity (%)
     max_capacity_pct: 100.0         # Maximum capacity (%)
     startup_time_s: 180.0           # Startup time (seconds)
@@ -42,6 +43,7 @@ crac_units:
   - unit_id: "CRAC-02"              # Will be assigned LAG role
     q_rated_kw: 50.0
     efficiency_cop: 3.5
+    rated_airflow_cfm: 8000.0       # Rated airflow (CFM)
     min_capacity_pct: 20.0
     max_capacity_pct: 100.0
     startup_time_s: 180.0
@@ -52,6 +54,7 @@ crac_units:
   - unit_id: "CRAC-03"              # Will be assigned STANDBY role
     q_rated_kw: 50.0
     efficiency_cop: 3.5
+    rated_airflow_cfm: 8000.0       # Rated airflow (CFM)
     min_capacity_pct: 20.0
     max_capacity_pct: 100.0
     startup_time_s: 180.0

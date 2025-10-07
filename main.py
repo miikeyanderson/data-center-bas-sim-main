@@ -205,15 +205,15 @@ def run_simulation(config: Dict[str, Any]) -> Dict[str, Any]:
     print(f"✅ Simulation Complete - Runtime: {elapsed_time:.2f}s")
     print()
     print("🎯 TEMPERATURE PERFORMANCE:")
-    print(f"   Average: {avg_temp:.3f}°C (target: {setpoint_c:.1f}°C)")
+    print(f"   Average: {format_temperature_dual(avg_temp)} (target: {format_temperature_dual(setpoint_c)})")
     print(f"   Std Dev: {temp_std:.3f}°C")
-    print(f"   Max Error: {max_error:.3f}°C")
+    print(f"   Max Error: {max_error:.3f}°C") 
     print(f"   Avg Error: {avg_error:.3f}°C")
     print(f"   In Range (±0.5°C): {control_accuracy:.1f}%")
     print()
     print("❄️  COOLING PERFORMANCE:")
-    print(f"   Average Output: {avg_cooling:.1f}kW")
-    print(f"   Total Energy: {total_energy_kwh:.2f}kWh")
+    print(f"   Average Output: {format_power(avg_cooling)}")
+    print(f"   Total Energy: {total_energy_kwh:.2f} kWh")
     print()
     
     # Final system state
@@ -224,7 +224,7 @@ def run_simulation(config: Dict[str, Any]) -> Dict[str, Any]:
         print(f"   {assignment['unit_id']}: {status_icon} "
               f"{assignment['role'].upper()} | {assignment['status']} | "
               f"{assignment['cmd_pct']:.1f}% | "
-              f"{assignment['q_cool_kw']:.1f}kW")
+              f"{format_power(assignment['q_cool_kw'])}")
     
     # Test criteria evaluation
     print()

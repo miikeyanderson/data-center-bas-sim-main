@@ -755,10 +755,6 @@ app.get('/ui', (req, res) => {
             document.getElementById(chartId).scrollIntoView({ behavior: 'smooth' });
         }
         
-        function toggleEngineerMode() {
-            const panel = document.getElementById('engineer-panel');
-            panel.classList.toggle('hidden');
-        }
         
         // Initialize on load
         window.addEventListener('load', function() {
@@ -932,12 +928,13 @@ app.get('/ui', (req, res) => {
 
         <!-- Engineer Mode Section -->
         <div class="mb-8">
-            <button 
-                class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2" 
-                onclick="toggleEngineerMode()">
-                🔬 Engineer Mode: Advanced Diagnostics
-            </button>
-            <div class="hidden mt-4 bg-card text-card-foreground rounded-lg border shadow-sm p-6" id="engineer-panel">
+            <div class="mb-4">
+                <h2 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+                    🔬 Advanced Diagnostics
+                </h2>
+                <p class="text-muted-foreground">Real-time PID controller analysis and system diagnostics</p>
+            </div>
+            <div class="bg-card text-card-foreground rounded-lg border shadow-sm p-6" id="engineer-panel">
                 <h3 class="text-lg font-semibold mb-4">PID Controller Analysis</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                     <div class="text-center">

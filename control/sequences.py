@@ -44,6 +44,7 @@ class CRACAssignment:
     assigned_time: float = 0.0            # When role was assigned (hours)
     staging_timer_s: float = 0.0          # Timer for staging delays
     destaging_timer_s: float = 0.0        # Timer for destaging delays
+    staging_timer_started: bool = False   # Flag to track if staging timer was started
 
 
 class CRACSequencer:
@@ -193,14 +194,15 @@ class CRACSequencer:
 
             if (error_with_hysteresis >= self.cfg.temp_error_threshold and
                     not self.lag_staged):
-                # Start staging timer if not already running
-                if lag_assignment.staging_timer_s <= 0:
+                # Start staging timer if not already started
+                if not lag_assignment.staging_timer_started:
                     lag_assignment.staging_timer_s = self.cfg.staging_delay_s
-
-                # Enable LAG if timer expired
-                if lag_assignment.staging_timer_s <= 0:
+                    lag_assignment.staging_timer_started = True
+                # Enable LAG if timer has expired
+                elif lag_assignment.staging_timer_s <= 0:
                     lag_assignment.unit.enable = True
                     self.lag_staged = True
+                    lag_assignment.staging_timer_started = False  # Reset for next time
 
             elif (self.lag_staged and
                   error_with_hysteresis <
@@ -215,6 +217,11 @@ class CRACSequencer:
                 if lag_assignment.destaging_timer_s <= 0:
                     lag_assignment.unit.enable = False
                     self.lag_staged = False
+            else:
+                # If error is below threshold and LAG not staged, reset staging flag
+                if (not self.lag_staged and 
+                        error_with_hysteresis < self.cfg.temp_error_threshold):
+                    lag_assignment.staging_timer_started = False
 
         # STANDBY staging logic (only if LEAD or LAG failed)
         lead_failed = lead_assignment is None or lead_assignment.unit.failed
@@ -284,6 +291,21 @@ class CRACSequencer:
             self.rotation_count += 1
             return True
         return False
+
+    def set_external_command(self, cmd_pct: float, priority: Optional[int] = None) -> None:
+        """
+        Set external command from BACnet or other external interface.
+        
+        Args:
+            cmd_pct: Command percentage (0-100%)
+            priority: BACnet priority level (1-16, where 1 is highest)
+        
+        Note: This could override internal PID control based on priority.
+        For now, we log the command but continue using internal control.
+        """
+        # For Phase 2, just log the external command
+        # In future phases, this could implement priority-based control override
+        print(f"🌐 BACnet command received: {cmd_pct:.1f}% (priority {priority})")
 
     def get_total_cooling_kw(self) -> float:
         """Calculate total cooling output from all units."""

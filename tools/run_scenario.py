@@ -335,9 +335,17 @@ class ScenarioRunner:
             'standby_staged': system_state['standby_staged']
         }
         
+        # Get PID terms from controller
+        pid_terms = {
+            'p_term': self.pid.p_term,
+            'i_term': self.pid.i_term,
+            'd_term': self.pid.d_term
+        }
+        
         self.historian.log_data(
             sim_time, room_data, crac_data, alarm_summary, pid_output,
-            staging_data=staging_data, active_alarm_list=active_alarms
+            staging_data=staging_data, active_alarm_list=active_alarms,
+            pid_terms=pid_terms
         )
     
     def _validate_scenario_results(self, lag_staging_time: Optional[float],

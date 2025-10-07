@@ -1,0 +1,27 @@
+================================================================================
+BAS SCENARIO TEST REPORT
+================================================================================
+Scenario: Rising IT Load Test
+Execution Time: 0.02s
+Overall Result: ❌ FAIL
+
+VALIDATION RESULTS:
+  TEMPERATURE_CONTROL: ❌ FAIL
+    max_temp_c: 27.365853658536583
+    limit_c: 24.0
+  LAG_STAGING: ❌ FAIL
+    actual_time_s: 0.0
+    min_time_s: 180.0
+    max_time_s: 420.0
+  ALARMS: ❌ FAIL
+    unexpected_alarms: ['HIGH_TEMP']
+    missing_alarms: []
+    triggered_alarms: ['HIGH_TEMP']
+
+KEY METRICS:
+  Max Temperature: 27.37°C
+  LAG Staging: Not triggered
+  Alarms Triggered: HIGH_TEMP
+
+⚠️  SCENARIO VALIDATION FAILED
+   Review validation details above

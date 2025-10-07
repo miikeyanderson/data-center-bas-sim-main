@@ -141,6 +141,9 @@ class CSVHistorian:
             # Time and control
             "timestamp", "sim_time_s", "setpoint_c", "avg_temp_c", "pid_output_pct",
             
+            # PID individual terms
+            "pid_p_term", "pid_i_term", "pid_d_term",
+            
             # Individual sensors (up to 5)
             "sensor_1_c", "sensor_2_c", "sensor_3_c", "sensor_4_c", "sensor_5_c",
             
@@ -179,7 +182,7 @@ class CSVHistorian:
             crac_data: List of CRAC unit states
             alarm_data: Alarm manager summary
             pid_output: Current PID controller output
-            **kwargs: Additional data to log
+            **kwargs: Additional data to log (including 'pid_terms' dict)
         """
         
         # Check if we should log this timestep
@@ -205,6 +208,14 @@ class CSVHistorian:
             f"{room_data.get('avg_temp_c', 0.0):.2f}",
             f"{pid_output:.1f}"
         ]
+        
+        # PID individual terms
+        pid_terms = kwargs.get('pid_terms', {})
+        row_data.extend([
+            f"{pid_terms.get('p_term', 0.0):.2f}",
+            f"{pid_terms.get('i_term', 0.0):.2f}",
+            f"{pid_terms.get('d_term', 0.0):.2f}"
+        ])
         
         # Individual sensors (pad to 5)
         sensors = room_data.get('sensor_temps', [])

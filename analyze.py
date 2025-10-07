@@ -80,8 +80,8 @@ class BASAnalyzer:
         duration_hours = df['elapsed_seconds'].iloc[-1] / 3600.0
         
         # Temperature performance
-        temp_error = df['average_temp_c'] - df['setpoint_c']
-        temp_std = df['average_temp_c'].std()
+        temp_error = df['avg_temp_c'] - df['setpoint_c']
+        temp_std = df['avg_temp_c'].std()
         max_error = abs(temp_error).max()
         avg_error = abs(temp_error).mean()
         
@@ -128,7 +128,7 @@ class BASAnalyzer:
             },
             'temperature': {
                 'setpoint_c': df['setpoint_c'].iloc[0],
-                'avg_temp_c': df['average_temp_c'].mean(),
+                'avg_temp_c': df['avg_temp_c'].mean(),
                 'std_dev_c': temp_std,
                 'max_error_c': max_error,
                 'avg_error_c': avg_error,
@@ -155,7 +155,7 @@ class BASAnalyzer:
         time_minutes = df['elapsed_minutes']
         
         # Temperature tracking
-        ax1.plot(time_minutes, df['average_temp_c'], 
+        ax1.plot(time_minutes, df['avg_temp_c'], 
                 label='Zone Temperature', color=BAS_COLORS['measurement'], linewidth=2)
         ax1.axhline(df['setpoint_c'].iloc[0], color=BAS_COLORS['setpoint'], 
                    linestyle='--', linewidth=2, label='Setpoint')
@@ -172,21 +172,33 @@ class BASAnalyzer:
         
         # PID terms (if available)
         if 'pid_p_term' in df.columns:
-            ax2.plot(time_minutes, df['pid_p_term'], label='P Term', color='#1f77b4')
-            ax2.plot(time_minutes, df['pid_i_term'], label='I Term', color='#ff7f0e')
-            ax2.plot(time_minutes, df['pid_d_term'], label='D Term', color='#2ca02c')
+            ax2.plot(time_minutes, df['pid_p_term'], label='P Term', 
+                    color=BAS_COLORS['output'], linewidth=2, linestyle='-')
+            ax2.plot(time_minutes, df['pid_i_term'], label='I Term', 
+                    color=BAS_COLORS['lag'], linewidth=2, linestyle='--')
+            ax2.plot(time_minutes, df['pid_d_term'], label='D Term', 
+                    color=BAS_COLORS['standby'], linewidth=2, linestyle='-.')
+            
+            # Add zero reference line
+            ax2.axhline(0, color='black', linestyle='-', alpha=0.5)
+            
             ax2.set_ylabel('PID Terms (%)')
-            ax2.set_title('PID Controller Terms')
+            ax2.set_title('PID Controller Individual Terms')
             ax2.legend()
             ax2.grid(True, alpha=0.3)
+            
+            # Add annotations for professional interpretation
+            ax2.text(0.02, 0.98, 'P: Proportional to error\nI: Integral of error history\nD: Derivative of measurement change', 
+                    transform=ax2.transAxes, fontsize=8, verticalalignment='top',
+                    bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
         else:
             # Show temperature error instead
-            temp_error = df['average_temp_c'] - df['setpoint_c']
+            temp_error = df['avg_temp_c'] - df['setpoint_c']
             ax2.plot(time_minutes, temp_error, color=BAS_COLORS['error'], linewidth=2)
             ax2.axhline(0, color='black', linestyle='-', alpha=0.5)
             ax2.fill_between(time_minutes, -0.5, 0.5, alpha=0.2, color=BAS_COLORS['setpoint'])
             ax2.set_ylabel('Temperature Error (°C)')
-            ax2.set_title('Temperature Error from Setpoint')
+            ax2.set_title('Temperature Error from Setpoint (PID terms not available)')
             ax2.grid(True, alpha=0.3)
         
         # Controller output
@@ -303,7 +315,7 @@ class BASAnalyzer:
         
         # Temperature control (top row, spans 2 columns)
         ax1 = fig.add_subplot(gs[0, :2])
-        ax1.plot(time_minutes, df['average_temp_c'], 
+        ax1.plot(time_minutes, df['avg_temp_c'], 
                 label='Zone Temp', color=BAS_COLORS['measurement'], linewidth=2)
         setpoint = df['setpoint_c'].iloc[0]
         ax1.axhline(setpoint, color=BAS_COLORS['setpoint'], 
@@ -398,9 +410,9 @@ class BASAnalyzer:
         fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(14, 10))
         
         # Temperature comparison
-        ax1.plot(df_before['elapsed_minutes'], df_before['average_temp_c'], 
+        ax1.plot(df_before['elapsed_minutes'], df_before['avg_temp_c'], 
                 label=before_label, color=BAS_COLORS['error'], linewidth=2)
-        ax1.plot(df_after['elapsed_minutes'], df_after['average_temp_c'], 
+        ax1.plot(df_after['elapsed_minutes'], df_after['avg_temp_c'], 
                 label=after_label, color=BAS_COLORS['measurement'], linewidth=2)
         setpoint = df_after['setpoint_c'].iloc[0]
         ax1.axhline(setpoint, color=BAS_COLORS['setpoint'], 

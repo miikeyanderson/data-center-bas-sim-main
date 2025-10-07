@@ -53,6 +53,12 @@ class PIDController:
         self.prev_output: float = 0.0
         self.first_update: bool = True
 
+        # Individual PID terms (for analysis and logging)
+        self.p_term: float = 0.0
+        self.i_term: float = 0.0
+        self.d_term: float = 0.0
+        self.last_error: float = 0.0
+
         # Statistics for tuning/diagnostics
         self.max_error: float = 0.0
         self.update_count: int = 0
@@ -81,7 +87,7 @@ class PIDController:
         self.max_error = max(self.max_error, abs(error))
 
         # Proportional term
-        p_term = self.cfg.kp * error
+        self.p_term = self.cfg.kp * error
 
         # Integral term with windup protection
         if not self.first_update:
@@ -93,16 +99,16 @@ class PIDController:
             self.integral = max(-max_integral,
                                 min(max_integral, self.integral))
 
-        i_term = self.cfg.ki * self.integral
+        self.i_term = self.cfg.ki * self.integral
 
         # Derivative term (derivative-on-measurement to prevent setpoint kick)
-        d_term = 0.0
+        self.d_term = 0.0
         if not self.first_update and dt > 0:
             measurement_rate = ((measurement - self.prev_measurement) / dt)
-            d_term = -self.cfg.kd * measurement_rate  # Negative for DOM
+            self.d_term = -self.cfg.kd * measurement_rate  # Negative for DOM
 
         # Calculate raw output
-        raw_output = p_term + i_term + d_term
+        raw_output = self.p_term + self.i_term + self.d_term
 
         # Apply output limits
         clamped_output = max(self.cfg.output_min,
@@ -122,9 +128,12 @@ class PIDController:
             excess = raw_output - clamped_output
             integral_excess = excess / self.cfg.ki
             self.integral -= integral_excess
+            # Update i_term after anti-windup correction
+            self.i_term = self.cfg.ki * self.integral
 
         # Update state for next iteration
         self.prev_error = error
+        self.last_error = error  # Store for diagnostics
         self.prev_measurement = measurement
         self.prev_output = clamped_output
         self.first_update = False
@@ -144,6 +153,13 @@ class PIDController:
         self.prev_measurement = 0.0
         self.prev_output = 0.0
         self.first_update = True
+        
+        # Reset individual terms
+        self.p_term = 0.0
+        self.i_term = 0.0
+        self.d_term = 0.0
+        self.last_error = 0.0
+        
         self.max_error = 0.0
         self.update_count = 0
 
@@ -168,5 +184,11 @@ class PIDController:
                 'prev_output': self.prev_output,
                 'max_error': self.max_error,
                 'update_count': self.update_count
+            },
+            'terms': {
+                'p_term': self.p_term,
+                'i_term': self.i_term,
+                'd_term': self.d_term,
+                'last_error': self.last_error
             }
         }

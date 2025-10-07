@@ -146,3 +146,14 @@ logs/
 
 # Claude Code
 .claude/
+
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Node-RED data
+.node-red/flows.json
+.node-red/flows_cred.json
+.node-red/.sessions.json

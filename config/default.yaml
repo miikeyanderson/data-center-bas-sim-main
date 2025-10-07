@@ -94,6 +94,193 @@ telemetry:
   csv_output_path: "reports/"       # CSV output directory
   data_retention_hours: 24.0        # Data retention period (hours)
 
+# Fault Simulation Configuration
+# Professional fault simulation for BAS troubleshooting and diagnostics
+fault_simulation:
+  enable_faults: true               # Enable fault simulation system
+  random_seed: 12345                # Random seed for deterministic fault injection
+  
+  # Sensor fault simulation
+  sensor_faults:
+    enable: true                    # Enable sensor fault simulation
+    
+    # Temperature sensor fault configurations
+    temperature_sensors:
+      - sensor_id: "TEMP_SENSOR_01"
+        location: "Zone_1"
+        enable_faults: true
+        fault_types:
+          - type: "drift"             # Gradual sensor drift
+            probability: 0.001        # Probability per timestep
+            drift_rate: 0.02          # Drift rate (°C/hour)
+            max_drift: 1.0            # Maximum total drift (°C)
+          - type: "bias"              # Systematic offset error
+            probability: 0.0005
+            bias_offset: 0.5          # Constant bias (°C)
+          - type: "intermittent"      # Random dropouts
+            probability: 0.0001
+            dropout_duration: 30.0    # Average dropout time (seconds)
+      
+      - sensor_id: "TEMP_SENSOR_02"
+        location: "Zone_2"
+        enable_faults: true
+        fault_types:
+          - type: "noise"             # Electronic noise
+            probability: 0.0002
+            noise_amplitude: 0.1      # RMS noise amplitude (°C)
+          - type: "stuck"             # Sensor frozen
+            probability: 0.0001
+            stuck_value: null         # null = stick at current value
+  
+  # Actuator fault simulation
+  actuator_faults:
+    enable: true                    # Enable actuator fault simulation
+    
+    # CRAC damper actuator configurations
+    crac_dampers:
+      - actuator_id: "CRAC_01_DAMPER"
+        location: "CRAC-01"
+        enable_faults: true
+        fault_types:
+          - type: "stiction"          # Static friction
+            probability: 0.0005
+            breakaway_threshold: 3.0  # Minimum command change (%) 
+            static_friction: 1.5      # Friction resistance (%)
+          - type: "backlash"          # Position hysteresis
+            probability: 0.0003
+            deadband: 2.0             # Deadband percentage
+            hysteresis_factor: 0.3    # Hysteresis strength
+          - type: "degradation"       # Performance degradation
+            probability: 0.0002
+            response_degradation: 0.3 # Response reduction factor
+            accuracy_loss: 2.0        # Position accuracy loss (%)
+      
+      - actuator_id: "CRAC_02_DAMPER"
+        location: "CRAC-02"
+        enable_faults: true
+        fault_types:
+          - type: "oscillation"       # Hunting behavior
+            probability: 0.0001
+            amplitude: 5.0            # Oscillation amplitude (%)
+            frequency: 0.1            # Oscillation frequency (Hz)
+          - type: "partial_failure"   # Limited range
+            probability: 0.0001
+            failure_rate: 0.1         # Range reduction rate (%/hour)
+  
+  # Control system fault simulation
+  control_faults:
+    enable: true                    # Enable control system fault simulation
+    
+    pid_controller:
+      enable_faults: true
+      fault_types:
+        - type: "short_cycling"      # Rapid equipment cycling
+          probability: 0.0002
+          cycle_threshold: 300.0      # Normal cycle time (seconds)
+          short_cycle_ratio: 0.3      # Ratio of normal cycle
+        - type: "controller_saturation" # Extended saturation
+          probability: 0.0001
+          saturation_threshold: 95.0  # Saturation threshold (%)
+          saturation_duration: 120.0  # Minimum saturation time (s)
+        - type: "communication_dropout" # Network failures
+          probability: 0.0001
+          dropout_duration: 60.0      # Average dropout time (seconds)
+          max_dropout: 300.0          # Maximum dropout time (seconds)
+        - type: "loop_instability"    # Control instability
+          probability: 0.00005
+          instability_gain: 1.5       # Gain increase factor
+          oscillation_period: 600.0   # Oscillation period (seconds)
+  
+  # Equipment fault simulation (extends existing MTBF/MTTR)
+  equipment_faults:
+    enable: true                    # Enable additional equipment faults
+    
+    crac_units:
+      - unit_id: "CRAC-01"
+        additional_faults:
+          - type: "performance_degradation" # Gradual capacity loss
+            probability: 0.00001
+            degradation_rate: 0.1     # Capacity loss rate (%/hour)
+            max_degradation: 25.0     # Maximum capacity loss (%)
+          - type: "efficiency_loss"   # COP degradation
+            probability: 0.00001
+            efficiency_loss_rate: 0.05 # COP loss rate per hour
+      
+      - unit_id: "CRAC-02"
+        additional_faults:
+          - type: "refrigerant_leak"  # Refrigerant loss
+            probability: 0.000005
+            leak_rate: 1.0            # Capacity loss rate (%/hour)
+          - type: "compressor_wear"   # Compressor degradation
+            probability: 0.000002
+            wear_factor: 1.2          # Performance reduction factor
+
+# Diagnostic System Configuration
+# Professional fault detection and root cause analysis
+diagnostics:
+  enable: true                      # Enable diagnostic system
+  
+  # Diagnostic engine settings
+  engine:
+    evaluation_interval_s: 60.0     # How often to run diagnostics (seconds)
+    confidence_threshold: 0.7       # Minimum confidence for fault confirmation
+    data_buffer_size: 1000          # Maximum data points to store
+    
+    # Diagnostic rules configuration
+    rules:
+      sensor_drift_detection:
+        enable: true
+        evaluation_interval_s: 300.0 # 5 minutes
+        confirmation_time_s: 1800.0  # 30 minutes
+        drift_threshold: 1.5          # Temperature drift threshold (°C)
+      
+      equipment_performance:
+        enable: true
+        evaluation_interval_s: 600.0 # 10 minutes
+        confirmation_time_s: 3600.0  # 1 hour
+        performance_threshold: 0.85   # 85% of expected performance
+      
+      control_instability:
+        enable: true
+        evaluation_interval_s: 120.0 # 2 minutes
+        confirmation_time_s: 600.0   # 10 minutes
+        variability_threshold: 15.0   # Control signal variability (%)
+      
+      energy_efficiency:
+        enable: true
+        evaluation_interval_s: 900.0 # 15 minutes
+        confirmation_time_s: 3600.0  # 1 hour
+        efficiency_threshold: 0.8     # 80% of expected efficiency
+  
+  # Root cause analysis settings
+  root_cause:
+    enable: true                    # Enable root cause analysis
+    analysis_depth: "detailed"      # "summary", "standard", "detailed"
+    correlation_threshold: 0.6      # Minimum correlation for cause linkage
+    evidence_weight: 1.0            # Weight of supporting evidence
+  
+  # Reporting configuration
+  reporting:
+    enable: true                    # Enable diagnostic reporting
+    auto_generate: true             # Automatically generate reports
+    
+    # Report settings
+    default_format: "markdown"      # "json", "csv", "markdown", "html"
+    output_directory: "reports/diagnostics/"
+    include_charts: true            # Include performance charts
+    include_raw_data: false         # Include raw diagnostic data
+    
+    # Report scheduling
+    daily_summary: true             # Generate daily health summary
+    weekly_analysis: true           # Generate weekly trend analysis
+    fault_reports: true             # Generate immediate fault reports
+    
+    # Report content
+    audience: "technical"            # "executive", "technical", "maintenance"
+    detail_level: "standard"        # "summary", "standard", "detailed"
+    company_name: "Data Center Operations"
+    facility_name: "Primary Data Center"
+
 # BACnet/IP Configuration
 # Professional building automation protocol integration
 bacnet:
@@ -136,3 +323,8 @@ bacnet:
     
     # Binary Outputs (BO) - Alarm/status outputs
     system_alarm_bo: 12              # System alarm status
+    
+    # Diagnostic status points
+    diagnostic_status_bo: 14         # Overall diagnostic system status
+    fault_count_ao: 15               # Active fault count
+    health_score_ao: 16              # System health score (0-100)

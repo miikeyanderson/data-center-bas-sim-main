@@ -1,0 +1,228 @@
+# Fault Demonstration Scenario Configuration
+# Accelerated fault injection for employer demonstrations
+
+system:
+  name: "Fault Simulation Demo"
+  version: "1.0"
+  description: "Accelerated fault injection demonstration for BAS troubleshooting capabilities"
+
+# Inherit base configuration but override fault parameters for demonstration
+inherit_from: "../default.yaml"
+
+# Override simulation parameters for demo
+simulation:
+  duration_minutes: 30.0            # Shorter demo duration
+  timestep_s: 1.0                   # Same timestep
+  output_interval_s: 30.0           # More frequent output for demo
+  setpoint_c: 22.0                  # Standard setpoint
+  random_seed: 54321                # Different seed for variety
+
+# Accelerated fault simulation for demonstration
+fault_simulation:
+  enable_faults: true               # Enable fault simulation
+  random_seed: 54321                # Demo-specific seed
+  
+  # Sensor fault simulation - ACCELERATED for demo
+  sensor_faults:
+    enable: true
+    
+    temperature_sensors:
+      - sensor_id: "TEMP_SENSOR_01"
+        location: "Zone_1"
+        enable_faults: true
+        fault_types:
+          - type: "drift"             # Sensor drift - accelerated
+            probability: 0.01         # 10x higher probability for demo
+            drift_rate: 0.2           # 10x faster drift rate
+            max_drift: 2.0            # Larger maximum drift
+          - type: "intermittent"      # Dropouts - more frequent
+            probability: 0.005        # 50x higher probability
+            dropout_duration: 15.0    # Shorter dropouts for demo
+      
+      - sensor_id: "TEMP_SENSOR_02"
+        location: "Zone_2"
+        enable_faults: true
+        fault_types:
+          - type: "bias"              # Systematic bias
+            probability: 0.003        # 6x higher probability
+            bias_offset: 1.0          # Larger bias for visibility
+          - type: "noise"             # Electronic noise
+            probability: 0.008        # 40x higher probability
+            noise_amplitude: 0.3      # Higher amplitude for demo
+      
+      - sensor_id: "TEMP_SENSOR_03"
+        location: "Zone_3"
+        enable_faults: true
+        fault_types:
+          - type: "stuck"             # Stuck sensor
+            probability: 0.002        # 20x higher probability
+            stuck_value: 24.5         # Stick at specific value
+
+  # Actuator fault simulation - ACCELERATED for demo
+  actuator_faults:
+    enable: true
+    
+    crac_dampers:
+      - actuator_id: "CRAC_01_DAMPER"
+        location: "CRAC-01"
+        enable_faults: true
+        fault_types:
+          - type: "stiction"          # Static friction - more aggressive
+            probability: 0.01         # 20x higher probability
+            breakaway_threshold: 5.0  # Higher threshold for demo
+            static_friction: 3.0      # More friction
+          - type: "backlash"          # Hysteresis - more pronounced
+            probability: 0.008        # 27x higher probability
+            deadband: 5.0             # Larger deadband for visibility
+            hysteresis_factor: 0.5    # Stronger hysteresis
+      
+      - actuator_id: "CRAC_02_DAMPER"
+        location: "CRAC-02"
+        enable_faults: true
+        fault_types:
+          - type: "oscillation"       # Hunting behavior - visible
+            probability: 0.005        # 50x higher probability
+            amplitude: 10.0           # Larger oscillation for demo
+            frequency: 0.3            # Faster oscillation
+          - type: "degradation"       # Performance loss
+            probability: 0.006        # 30x higher probability
+            response_degradation: 0.6 # Slower response for demo
+            accuracy_loss: 5.0        # More accuracy loss
+
+  # Control system fault simulation - ACCELERATED for demo
+  control_faults:
+    enable: true
+    
+    pid_controller:
+      enable_faults: true
+      fault_types:
+        - type: "short_cycling"      # Rapid cycling - very visible
+          probability: 0.01          # 50x higher probability
+          cycle_threshold: 180.0     # Shorter normal cycle
+          short_cycle_ratio: 0.2     # More aggressive short cycling
+        - type: "controller_saturation" # Extended saturation
+          probability: 0.005         # 50x higher probability
+          saturation_threshold: 90.0 # Lower threshold for demo
+          saturation_duration: 60.0  # Shorter duration for demo
+        - type: "communication_dropout" # Network failures
+          probability: 0.008         # 80x higher probability
+          dropout_duration: 30.0     # Shorter dropouts for demo
+          max_dropout: 120.0         # Shorter max dropout
+        - type: "loop_instability"   # Control instability
+          probability: 0.003         # 60x higher probability
+          instability_gain: 2.0      # More aggressive instability
+          oscillation_period: 300.0  # Faster oscillation
+
+  # Equipment fault simulation - ACCELERATED for demo
+  equipment_faults:
+    enable: true
+    
+    crac_units:
+      - unit_id: "CRAC-01"
+        additional_faults:
+          - type: "performance_degradation" # Capacity loss
+            probability: 0.002       # 200x higher probability
+            degradation_rate: 2.0    # 20x faster degradation
+            max_degradation: 40.0    # Larger degradation for demo
+          - type: "efficiency_loss"  # COP degradation
+            probability: 0.002       # 200x higher probability
+            efficiency_loss_rate: 1.0 # 20x faster efficiency loss
+      
+      - unit_id: "CRAC-02"
+        additional_faults:
+          - type: "refrigerant_leak" # Refrigerant loss
+            probability: 0.001       # 200x higher probability
+            leak_rate: 5.0           # 5x faster leak for demo
+          - type: "compressor_wear"  # Compressor degradation
+            probability: 0.0008      # 400x higher probability
+            wear_factor: 1.5         # More pronounced wear
+
+# Diagnostic system - optimized for demo
+diagnostics:
+  enable: true
+  
+  engine:
+    evaluation_interval_s: 30.0     # More frequent evaluation for demo
+    confidence_threshold: 0.6       # Lower threshold for demo visibility
+    data_buffer_size: 500           # Smaller buffer for demo
+    
+    rules:
+      sensor_drift_detection:
+        enable: true
+        evaluation_interval_s: 60.0  # More frequent for demo
+        confirmation_time_s: 180.0   # Faster confirmation for demo
+        drift_threshold: 1.0         # Lower threshold for demo
+      
+      equipment_performance:
+        enable: true
+        evaluation_interval_s: 120.0 # More frequent for demo
+        confirmation_time_s: 300.0   # Faster confirmation
+        performance_threshold: 0.8   # Lower threshold for demo
+      
+      control_instability:
+        enable: true
+        evaluation_interval_s: 60.0  # More frequent for demo
+        confirmation_time_s: 180.0   # Faster confirmation
+        variability_threshold: 10.0  # Lower threshold for demo visibility
+      
+      energy_efficiency:
+        enable: true
+        evaluation_interval_s: 180.0 # More frequent for demo
+        confirmation_time_s: 300.0   # Faster confirmation
+        efficiency_threshold: 0.75   # Lower threshold for demo
+
+  root_cause:
+    enable: true
+    analysis_depth: "detailed"      # Full analysis for demo
+    correlation_threshold: 0.5      # Lower threshold for demo
+    evidence_weight: 1.2            # Higher evidence weight
+
+  reporting:
+    enable: true
+    auto_generate: true             # Auto-generate reports for demo
+    default_format: "markdown"
+    output_directory: "reports/fault_demo/"
+    include_charts: true
+    include_raw_data: true          # Include raw data for demo
+    daily_summary: false            # Disable for short demo
+    weekly_analysis: false          # Disable for short demo  
+    fault_reports: true             # Enable immediate fault reports
+    audience: "technical"
+    detail_level: "detailed"        # Detailed for demo
+    company_name: "Demo Data Center"
+    facility_name: "Fault Simulation Showcase"
+
+# Override CRAC MTBF for more equipment failures during demo
+crac_units:
+  - unit_id: "CRAC-01"
+    q_rated_kw: 50.0
+    efficiency_cop: 3.5
+    rated_airflow_cfm: 8000.0
+    min_capacity_pct: 20.0
+    max_capacity_pct: 100.0
+    startup_time_s: 180.0
+    shutdown_time_s: 60.0
+    mtbf_hours: 50.0                # Much shorter MTBF for demo
+    mttr_hours: 2.0                 # Shorter MTTR for demo
+
+  - unit_id: "CRAC-02"
+    q_rated_kw: 50.0
+    efficiency_cop: 3.5
+    rated_airflow_cfm: 8000.0
+    min_capacity_pct: 20.0
+    max_capacity_pct: 100.0
+    startup_time_s: 180.0
+    shutdown_time_s: 60.0
+    mtbf_hours: 80.0                # Shorter MTBF for demo
+    mttr_hours: 1.5                 # Shorter MTTR for demo
+
+  - unit_id: "CRAC-03"
+    q_rated_kw: 50.0
+    efficiency_cop: 3.5
+    rated_airflow_cfm: 8000.0
+    min_capacity_pct: 20.0
+    max_capacity_pct: 100.0
+    startup_time_s: 180.0
+    shutdown_time_s: 60.0
+    mtbf_hours: 120.0               # Shorter MTBF for demo
+    mttr_hours: 3.0                 # Standard MTTR

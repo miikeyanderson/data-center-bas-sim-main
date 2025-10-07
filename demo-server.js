@@ -376,8 +376,8 @@ RED.init(server, settings);
 app.use(settings.httpAdminRoot, RED.httpAdmin);
 app.use(settings.httpNodeRoot, RED.httpNode);
 
-// Copy enhanced flows to demo flows
-const enhancedFlowsPath = path.join(__dirname, 'hmi', 'enhanced-node-red-flows.json');
+// Copy production flows to demo flows
+const productionFlowsPath = path.join(__dirname, 'hmi', 'production-node-red-flows.json');
 const demoFlowsPath = path.join(__dirname, '.node-red', 'demo-flows.json');
 
 // Ensure .node-red directory exists
@@ -386,13 +386,13 @@ if (!fs.existsSync(nodeRedDir)) {
     fs.mkdirSync(nodeRedDir, { recursive: true });
 }
 
-// Copy flows if enhanced flows exist
-if (fs.existsSync(enhancedFlowsPath)) {
+// Copy flows if production flows exist
+if (fs.existsSync(productionFlowsPath)) {
     try {
-        fs.copyFileSync(enhancedFlowsPath, demoFlowsPath);
-        console.log('✅ Enhanced Node-RED flows loaded for demo');
+        fs.copyFileSync(productionFlowsPath, demoFlowsPath);
+        console.log('✅ Production Node-RED flows loaded for demo');
     } catch (error) {
-        console.log('⚠️ Could not copy enhanced flows, using default');
+        console.log('⚠️ Could not copy production flows, using default');
     }
 }
 

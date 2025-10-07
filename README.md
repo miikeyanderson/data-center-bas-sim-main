@@ -1,12 +1,14 @@
 # Data Center BAS Control System
 
-A professional Building Automation System (BAS) simulation for data center cooling systems. This project demonstrates real-world control strategies, alarm management, and commissioning workflows used in mission-critical facilities.
+A professional Building Automation System (BAS) simulation platform for data center cooling systems. This project demonstrates real-world control strategies, alarm management, and commissioning workflows used in mission-critical facilities.
 
 ## Overview
 
-This system simulates a typical data center cooling plant with multiple CRAC units, implementing industry-standard control sequences and monitoring capabilities. Built with Python, it provides a complete framework for testing, validation, and operator training.
+This system simulates a typical data center cooling plant with multiple CRAC units, implementing industry-standard control sequences and monitoring capabilities. Built with Python, it provides a complete **config-driven simulation platform** for testing, validation, and operator training.
 
 **Key Features:**
+- **Professional CLI Interface**: Configuration-driven with scenarios and parameter overrides
+- **YAML Configuration Management**: Schema-validated configs with deep-merge override system
 - Multi-CRAC lead/lag/standby staging with automatic failover
 - Professional PID temperature control with anti-windup protection  
 - Comprehensive alarm management system with priority handling
@@ -21,7 +23,7 @@ This system simulates a typical data center cooling plant with multiple CRAC uni
 │   Room Thermal  │    │  Control System  │    │  CRAC Units     │
 │   Model         │◄──►│  • PID Controller│◄──►│  • Lead/Lag     │
 │   • 35-70kW IT  │    │  • Sequencer     │    │  • Standby      │
-│   • Heat Balance│    │  • Alarm Mgr     │    │  • 60kW Each    │
+│   • Heat Balance│    │  • Alarm Mgr     │    │  • 50kW Each    │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
          │                       │                       │
          └───────────────────────┼───────────────────────┘
@@ -30,7 +32,7 @@ This system simulates a typical data center cooling plant with multiple CRAC uni
                     │    Monitoring        │
                     │  • Node-RED HMI      │
                     │  • CSV Historian     │
-                    │  • Scenario Runner   │
+                    │  • Config Platform   │
                     └──────────────────────┘
 ```
 
@@ -44,15 +46,106 @@ git clone <repository-url>
 cd data-center-bas-sim-main
 pip install -r requirements.txt
 
-# Run steady-state validation
-python main.py
+# Install config dependencies
+pip install pyyaml jsonschema
 
-# Test rising load scenario  
-python tools/run_scenario.py scenarios/rising_load.json
+# Validate configuration
+python main.py validate --config config/default.yaml
+
+# Run baseline simulation
+python main.py run --config config/default.yaml --scenario baseline
+
+# Run test scenarios
+python main.py run --config config/default.yaml --scenario rising_load
+python main.py run --config config/default.yaml --scenario crac_failure
+
+# Override parameters
+python main.py run --config config/default.yaml --set room.it_load_kw=60.0
 
 # Launch HMI dashboard
 node-red hmi/node-red-flows.json
 ```
+
+## Configuration-Driven Architecture
+
+### Professional CLI Interface
+
+The simulation platform provides a professional command-line interface with multiple subcommands:
+
+```bash
+# Configuration validation
+python main.py validate --config config/custom.yaml
+
+# Simulation execution  
+python main.py run --config config/default.yaml [options]
+
+# Performance benchmarking
+python main.py benchmark --config config/default.yaml --duration 30
+
+# Configuration export
+python main.py export --config config/default.yaml --format yaml
+```
+
+### YAML Configuration System
+
+All system parameters are managed through professional YAML configuration files:
+
+**Master Configuration** (`config/default.yaml`):
+```yaml
+system:
+  name: "Data Center BAS Simulation"
+  version: "1.0"
+
+room:
+  initial_temp_c: 22.0
+  it_load_kw: 40.0
+  thermal_mass_kj_per_c: 2500.0
+
+pid_controller:
+  kp: 3.0
+  ki: 0.15
+  kd: 0.08
+
+crac_units:
+  - unit_id: "CRAC-01"     # Auto-assigned LEAD role
+    q_rated_kw: 50.0
+    efficiency_cop: 3.5
+  - unit_id: "CRAC-02"     # Auto-assigned LAG role  
+    q_rated_kw: 50.0
+  - unit_id: "CRAC-03"     # Auto-assigned STANDBY role
+    q_rated_kw: 50.0
+
+simulation:
+  duration_minutes: 60.0
+  timestep_s: 1.0
+  setpoint_c: 22.0
+```
+
+### Scenario Override System
+
+Test scenarios are defined as YAML files that override base configuration:
+
+**Rising Load Scenario** (`config/scenarios/rising_load.yaml`):
+```yaml
+simulation:
+  duration_minutes: 15.0
+
+room:
+  it_load_kw: 35.0  # Starting load
+
+load_profile:
+  type: "ramp"
+  start_load_kw: 35.0
+  end_load_kw: 70.0
+```
+
+### Schema Validation
+
+All configurations are validated against comprehensive JSON schemas ensuring:
+- Type safety and value ranges
+- Required parameter checking  
+- Professional error reporting
+- Configuration consistency
 
 ## Control System Features
 
@@ -65,17 +158,18 @@ node-red hmi/node-red-flows.json
 - **Lead Unit**: Primary cooling, runs continuously at minimum load
 - **Lag Unit**: Stages when temperature error exceeds 0.8°C for >3 minutes  
 - **Standby Unit**: Activates only during equipment failures
-- **Role Rotation**: Automatic weekly rotation for even equipment wear
+- **Role Rotation**: Automatic daily rotation for even equipment wear
 
 ### Redundancy & Failover
 - **N+1 Configuration**: System maintains cooling with any single CRAC failure
 - **Failover Time**: <15 seconds for equipment fault detection and response
-- **Capacity**: 180kW total (3×60kW) for 70kW maximum IT load + envelope losses
+- **Capacity**: 150kW total (3×50kW) for 70kW maximum IT load + envelope losses
 
 ## Alarm Management
 
 **Standard BAS Alarms:**
-- `HIGH_TEMP` - Space temperature >24°C for >2 minutes (Critical)
+- `HIGH_TEMP` - Space temperature >27°C for >2 minutes (Critical)
+- `LOW_TEMP` - Space temperature <18°C for >2 minutes (Critical)
 - `CRAC_FAIL` - Unit commanded but no cooling output (High)  
 - `SENSOR_STUCK` - Temperature reading unchanged >10 minutes (Medium)
 
@@ -88,20 +182,36 @@ node-red hmi/node-red-flows.json
 ## Testing & Validation
 
 ### Automated Scenarios
-- **Steady State**: 30-minute validation achieving 94.2% time in setpoint band
-- **Rising Load**: IT load ramp from 35kW to 70kW validates staging response  
-- **Equipment Failure**: CRAC failure triggers proper redundancy activation
+
+**Baseline Scenario** (`baseline`):
+- 60-minute steady-state validation
+- Tight temperature control verification
+- Single CRAC operation confirmation
+
+**Rising Load Scenario** (`rising_load`):
+- IT load ramp from 35kW to 70kW over 10 minutes
+- Validates LAG staging response timing
+- Ensures no high temperature alarms
+
+**Equipment Failure Scenario** (`crac_failure`):
+- LEAD CRAC failure at t=5 minutes
+- Tests automatic role promotion
+- Validates redundancy activation
 
 ### Performance Metrics
 - **Temperature Control**: ±0.5°C accuracy (exceeds ±1.0°C industry standard)
-- **Energy Efficiency**: 3.2 COP average (Energy Star compliant)
+- **Energy Efficiency**: 3.5 COP average (Energy Star compliant)
 - **Reliability**: N+1 redundancy validated operational
 - **Response Time**: All scenarios complete within <5 minute acceptance criteria
 
 ```bash
-# Run all commissioning tests
-python tools/run_scenario.py scenarios/rising_load.json
-python tools/run_scenario.py scenarios/crac_failure.json
+# Run commissioning test suite
+python main.py run --config config/default.yaml --scenario baseline
+python main.py run --config config/default.yaml --scenario rising_load  
+python main.py run --config config/default.yaml --scenario crac_failure
+
+# Performance benchmarking
+python main.py benchmark --config config/default.yaml --iterations 5
 ```
 
 ## Monitoring & HMI
@@ -110,10 +220,10 @@ python tools/run_scenario.py scenarios/crac_failure.json
 - Real-time temperature display with alarm indicators
 - CRAC status table showing role, capacity, and power consumption
 - Manual controls for setpoint adjustment and equipment testing
-- Historical trending with 10-minute data retention
+- Historical trending with configurable data retention
 
 ### Data Logging
-- CSV historian with configurable 1-5 second sampling
+- CSV historian with configurable 1-60 second sampling
 - Comprehensive telemetry: temperatures, equipment status, power consumption
 - Automatic file rotation and cleanup for long-term operation
 - Integration-ready format for external analytics tools
@@ -127,33 +237,73 @@ python tools/run_scenario.py scenarios/crac_failure.json
 - Energy Star: Equipment efficiency requirements
 
 **Engineering Practices:**
-- Version-controlled configuration management
+- Professional configuration management with schema validation
 - Automated testing for commissioning validation
-- Professional alarm management with proper prioritization
+- CLI-driven operation for integration and deployment
 - Comprehensive documentation following industry standards
 
 ## Project Structure
 
 ```
 data-center-bas-sim-main/
-├── control/           # Control algorithms
-│   ├── pid.py         # PID controller with anti-windup
-│   ├── sequences.py   # Multi-CRAC staging logic
-│   └── alarms.py      # Professional alarm management
-├── sim/               # Simulation models  
-│   ├── environment.py # Room thermal dynamics
-│   └── crac.py        # CRAC unit modeling
-├── telemetry/         # Data management
-│   └── historian.py   # CSV data logging
-├── scenarios/         # Test configurations
-│   ├── rising_load.json
-│   └── crac_failure.json
-├── tools/             # Utilities
-│   └── run_scenario.py # Automated testing framework
-├── hmi/               # Human-machine interface
-│   └── node-red-flows.json # Dashboard configuration
-└── reports/           # Documentation
-    └── commissioning.md # Professional test procedures
+├── config/                    # Configuration management
+│   ├── default.yaml          # Master system configuration
+│   ├── config_loader.py      # Professional config system
+│   ├── scenarios/            # Test scenario definitions
+│   │   ├── baseline.yaml
+│   │   ├── rising_load.yaml
+│   │   └── crac_failure.yaml
+│   └── schemas/              # Validation schemas
+│       └── config_schema.yaml
+├── control/                  # Control algorithms
+│   ├── pid.py               # PID controller with anti-windup
+│   ├── sequences.py         # Multi-CRAC staging logic
+│   └── alarms.py            # Professional alarm management
+├── sim/                     # Simulation models  
+│   ├── environment.py       # Room thermal dynamics
+│   └── crac.py              # CRAC unit modeling
+├── telemetry/               # Data management
+│   └── historian.py         # CSV data logging
+├── tools/                   # Legacy utilities
+│   └── run_scenario.py      # Original scenario runner
+├── hmi/                     # Human-machine interface
+│   └── node-red-flows.json  # Dashboard configuration
+├── reports/                 # Documentation and results
+└── main.py                  # Professional CLI interface
+```
+
+## Configuration Management
+
+### File Organization
+
+**Base Configuration** (`config/default.yaml`):
+- Complete system definition with all required parameters
+- Production-ready defaults for typical data center operation
+- Schema-validated for consistency and correctness
+
+**Scenario Overrides** (`config/scenarios/*.yaml`):
+- Test-specific parameter modifications
+- Clean separation of test conditions from base system
+- Inheritance-based configuration for maintainability
+
+**Schema Validation** (`config/schemas/config_schema.yaml`):
+- Comprehensive validation rules for all parameters
+- Type checking, range validation, and dependency verification
+- Professional error reporting for configuration issues
+
+### CLI Parameter Overrides
+
+Runtime parameter modification without editing configuration files:
+
+```bash
+# Single parameter override
+python main.py run --config config/default.yaml --set room.it_load_kw=80.0
+
+# Multiple overrides
+python main.py run --config config/default.yaml \
+    --set room.it_load_kw=60.0 \
+    --set pid_controller.kp=4.0 \
+    --set simulation.duration_minutes=30
 ```
 
 ## Commissioning Documentation
@@ -162,13 +312,16 @@ Complete commissioning procedures and test results are documented in [`reports/c
 
 - Detailed test procedures for each scenario
 - Performance validation with acceptance criteria
-- HMI screenshots demonstrating system operation
+- CLI usage examples and configuration guidance
 - Engineering recommendations and sign-off documentation
 
 ## Development Approach
 
 This project demonstrates professional BAS engineering practices:
 
+- **Configuration-Driven Architecture**: Complete separation of system parameters from implementation
+- **Schema Validation**: Professional configuration management with error checking
+- **CLI Interface**: Enterprise-grade command-line tools for operation and integration
 - **Modular Design**: Separate concerns for maintainability and testing
 - **Industry Standards**: Follows established BAS control sequences and practices  
 - **Testing Framework**: Automated validation ensures reliable commissioning
@@ -181,6 +334,8 @@ This project demonstrates professional BAS engineering practices:
 - Integration with BACnet/IP for interoperability testing
 - Machine learning optimization for predictive staging
 - Digital twin integration with real facility data
+- Web-based configuration interface for non-technical users
+- Docker containerization for deployment flexibility
 
 ## License
 
@@ -188,4 +343,4 @@ MIT License - Created for portfolio demonstration and educational purposes.
 
 ---
 
-*This project showcases professional Building Automation System engineering practices for data center applications, demonstrating competency in control systems, alarm management, HMI development, and commissioning procedures.*
+*This project showcases professional Building Automation System engineering practices for data center applications, demonstrating competency in control systems, configuration management, CLI development, alarm management, HMI development, and commissioning procedures.*

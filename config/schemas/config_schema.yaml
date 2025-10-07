@@ -1,0 +1,301 @@
+# JSON Schema for BAS Simulation Configuration
+# Validates all config files against expected structure and types
+
+type: object
+required:
+  - system
+  - room
+  - pid_controller
+  - crac_units
+  - simulation
+
+properties:
+  system:
+    type: object
+    required: [name, version]
+    properties:
+      name:
+        type: string
+        description: "Human-readable system name"
+      version:
+        type: string
+        pattern: "^\\d+\\.\\d+(\\.\\d+)?$"
+        description: "Semantic version (e.g., '1.0.0')"
+      description:
+        type: string
+        description: "Optional system description"
+
+  room:
+    type: object
+    required: [initial_temp_c, thermal_mass_kj_per_c, it_load_kw]
+    properties:
+      initial_temp_c:
+        type: number
+        minimum: 10.0
+        maximum: 40.0
+        description: "Initial room temperature (°C)"
+      ambient_temp_c:
+        type: number
+        minimum: 10.0
+        maximum: 40.0
+        default: 22.0
+        description: "Ambient temperature (°C)"
+      thermal_mass_kj_per_c:
+        type: number
+        minimum: 100.0
+        maximum: 10000.0
+        description: "Thermal mass (kJ/°C)"
+      ua_kw_per_c:
+        type: number
+        minimum: 0.0
+        maximum: 5.0
+        default: 0.25
+        description: "Envelope heat transfer coefficient (kW/°C)"
+      it_load_kw:
+        type: number
+        minimum: 0.0
+        maximum: 1000.0
+        description: "IT server load (kW)"
+      infil_ua_kw_per_c:
+        type: number
+        minimum: 0.0
+        maximum: 2.0
+        default: 0.0
+        description: "Infiltration heat transfer coefficient (kW/°C)"
+      n_virtual_sensors:
+        type: integer
+        minimum: 1
+        maximum: 10
+        default: 3
+        description: "Number of virtual temperature sensors"
+
+  pid_controller:
+    type: object
+    required: [kp, ki, kd]
+    properties:
+      kp:
+        type: number
+        minimum: 0.0
+        maximum: 50.0
+        description: "Proportional gain (%/°C)"
+      ki:
+        type: number
+        minimum: 0.0
+        maximum: 5.0
+        description: "Integral gain (%/(°C·s))"
+      kd:
+        type: number
+        minimum: 0.0
+        maximum: 5.0
+        description: "Derivative gain (%/(°C/s))"
+      output_min:
+        type: number
+        minimum: 0.0
+        maximum: 100.0
+        default: 0.0
+        description: "Minimum output (%)"
+      output_max:
+        type: number
+        minimum: 0.0
+        maximum: 100.0
+        default: 100.0
+        description: "Maximum output (%)"
+      rate_limit:
+        type: number
+        minimum: 0.1
+        maximum: 100.0
+        default: 10.0
+        description: "Maximum change rate (%/s)"
+      integral_windup_limit:
+        type: number
+        minimum: 1.0
+        maximum: 200.0
+        default: 50.0
+        description: "Integral windup protection limit (%)"
+
+  crac_units:
+    type: array
+    minItems: 1
+    maxItems: 10
+    items:
+      type: object
+      required: [unit_id, q_rated_kw]
+      properties:
+        unit_id:
+          type: string
+          pattern: "^CRAC-\\d{2}$"
+          description: "Unique CRAC unit identifier (e.g., 'CRAC-01')"
+        q_rated_kw:
+          type: number
+          minimum: 1.0
+          maximum: 200.0
+          description: "Rated cooling capacity (kW)"
+        efficiency_cop:
+          type: number
+          minimum: 1.0
+          maximum: 10.0
+          default: 3.5
+          description: "Coefficient of performance"
+        min_capacity_pct:
+          type: number
+          minimum: 0.0
+          maximum: 50.0
+          default: 20.0
+          description: "Minimum capacity (%)"
+        max_capacity_pct:
+          type: number
+          minimum: 50.0
+          maximum: 100.0
+          default: 100.0
+          description: "Maximum capacity (%)"
+        startup_time_s:
+          type: number
+          minimum: 30.0
+          maximum: 600.0
+          default: 180.0
+          description: "Startup time (seconds)"
+        shutdown_time_s:
+          type: number
+          minimum: 10.0
+          maximum: 300.0
+          default: 60.0
+          description: "Shutdown time (seconds)"
+        mtbf_hours:
+          type: number
+          minimum: 100.0
+          maximum: 100000.0
+          default: 8760.0
+          description: "Mean time between failures (hours)"
+        mttr_hours:
+          type: number
+          minimum: 1.0
+          maximum: 100.0
+          default: 4.0
+          description: "Mean time to repair (hours)"
+
+  staging_config:
+    type: object
+    properties:
+      temp_error_threshold:
+        type: number
+        minimum: 0.1
+        maximum: 5.0
+        default: 0.8
+        description: "Temperature error threshold for staging (°C)"
+      staging_delay_s:
+        type: number
+        minimum: 30.0
+        maximum: 600.0
+        default: 180.0
+        description: "Staging delay (seconds)"
+      destaging_delay_s:
+        type: number
+        minimum: 60.0
+        maximum: 1200.0
+        default: 300.0
+        description: "Destaging delay (seconds)"
+      rotation_runtime_hours:
+        type: number
+        minimum: 1.0
+        maximum: 168.0
+        default: 24.0
+        description: "Runtime before rotation (hours)"
+      enable_rotation:
+        type: boolean
+        default: true
+        description: "Enable automatic CRAC rotation"
+      staging_hysteresis:
+        type: number
+        minimum: 0.1
+        maximum: 1.0
+        default: 0.2
+        description: "Staging hysteresis (°C)"
+      destaging_hysteresis:
+        type: number
+        minimum: 0.1
+        maximum: 1.0
+        default: 0.3
+        description: "Destaging hysteresis (°C)"
+
+  simulation:
+    type: object
+    required: [duration_minutes, timestep_s]
+    properties:
+      duration_minutes:
+        type: number
+        minimum: 1.0
+        maximum: 1440.0
+        description: "Simulation duration (minutes)"
+      timestep_s:
+        type: number
+        minimum: 0.1
+        maximum: 60.0
+        default: 1.0
+        description: "Simulation timestep (seconds)"
+      output_interval_s:
+        type: number
+        minimum: 1.0
+        maximum: 300.0
+        default: 60.0
+        description: "Data output interval (seconds)"
+      setpoint_c:
+        type: number
+        minimum: 18.0
+        maximum: 26.0
+        default: 22.0
+        description: "Temperature setpoint (°C)"
+      random_seed:
+        type: integer
+        minimum: 1
+        maximum: 999999
+        description: "Random seed for reproducibility"
+
+  alarms:
+    type: object
+    properties:
+      enable_alarms:
+        type: boolean
+        default: true
+        description: "Enable alarm system"
+      high_temp_threshold_c:
+        type: number
+        minimum: 20.0
+        maximum: 35.0
+        default: 27.0
+        description: "High temperature alarm threshold (°C)"
+      low_temp_threshold_c:
+        type: number
+        minimum: 15.0
+        maximum: 25.0
+        default: 18.0
+        description: "Low temperature alarm threshold (°C)"
+      alarm_delay_s:
+        type: number
+        minimum: 30.0
+        maximum: 300.0
+        default: 120.0
+        description: "Alarm activation delay (seconds)"
+
+  telemetry:
+    type: object
+    properties:
+      enable_csv_export:
+        type: boolean
+        default: true
+        description: "Enable CSV data export"
+      enable_real_time_display:
+        type: boolean
+        default: true
+        description: "Enable real-time console output"
+      csv_output_path:
+        type: string
+        default: "reports/"
+        description: "CSV output directory path"
+      data_retention_hours:
+        type: number
+        minimum: 1.0
+        maximum: 168.0
+        default: 24.0
+        description: "Data retention period (hours)"
+
+additionalProperties: false

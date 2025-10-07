@@ -1,0 +1,29 @@
+# Baseline Scenario
+# Standard operating conditions for system validation
+
+# Override base simulation parameters  
+simulation:
+  duration_minutes: 60.0
+  setpoint_c: 22.0
+  
+# Standard room conditions (matches default config)
+room:
+  initial_temp_c: 22.0
+  it_load_kw: 40.0  # Steady 40kW load
+
+# Expected steady-state behavior
+expected_behavior:
+  steady_state_time_s: 300.0     # Should reach steady state in 5 minutes
+  max_temp_error_c: 0.5          # Tight control tolerance
+  no_alarms: true                # No alarms expected
+  lead_only_operation: true      # Should run on LEAD unit only
+  description: "Steady-state operation with tight temperature control"
+
+# Validation criteria for baseline performance
+validation_criteria:
+  max_temperature_c: 22.5
+  min_temperature_c: 21.5
+  max_avg_error_c: 0.3
+  max_std_dev_c: 0.2
+  min_control_accuracy_pct: 95.0
+  alarm_tolerance: []            # No alarms tolerated

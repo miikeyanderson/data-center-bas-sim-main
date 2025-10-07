@@ -1,0 +1,92 @@
+# Default BAS Simulation Configuration
+# Professional data center cooling system parameters
+
+system:
+  name: "Data Center BAS Simulation"
+  version: "1.0"
+  description: "Professional Building Automation System simulation for data center cooling"
+
+# Room/Zone Configuration
+room:
+  initial_temp_c: 22.0              # Initial room temperature (°C)
+  ambient_temp_c: 22.0              # Ambient/outside temperature (°C)
+  thermal_mass_kj_per_c: 2500.0     # Thermal mass (kJ/°C) - medium data center
+  ua_kw_per_c: 0.25                 # Envelope heat transfer coefficient (kW/°C)
+  it_load_kw: 40.0                  # IT server load (kW)
+  infil_ua_kw_per_c: 0.0            # Infiltration heat transfer (kW/°C)
+  n_virtual_sensors: 3              # Number of virtual temperature sensors
+
+# PID Controller Configuration
+pid_controller:
+  kp: 3.0                           # Proportional gain (%/°C) - aggressive for data center
+  ki: 0.15                          # Integral gain (%/(°C·s)) - moderate
+  kd: 0.08                          # Derivative gain (%/(°C/s)) - light
+  output_min: 0.0                   # Minimum output (%)
+  output_max: 100.0                 # Maximum output (%)
+  rate_limit: 15.0                  # Maximum change rate (%/s) - protect actuators
+  integral_windup_limit: 40.0       # Integral windup protection (%)
+
+# CRAC Unit Configuration
+# Note: Roles assigned automatically by sequencer (1st=LEAD, 2nd=LAG, 3rd+=STANDBY)
+crac_units:
+  - unit_id: "CRAC-01"              # Will be assigned LEAD role
+    q_rated_kw: 50.0                # Rated cooling capacity (kW)
+    efficiency_cop: 3.5             # Coefficient of performance
+    min_capacity_pct: 20.0          # Minimum capacity (%)
+    max_capacity_pct: 100.0         # Maximum capacity (%)
+    startup_time_s: 180.0           # Startup time (seconds)
+    shutdown_time_s: 60.0           # Shutdown time (seconds)
+    mtbf_hours: 8760.0              # Mean time between failures (hours) - 1 year
+    mttr_hours: 4.0                 # Mean time to repair (hours)
+
+  - unit_id: "CRAC-02"              # Will be assigned LAG role
+    q_rated_kw: 50.0
+    efficiency_cop: 3.5
+    min_capacity_pct: 20.0
+    max_capacity_pct: 100.0
+    startup_time_s: 180.0
+    shutdown_time_s: 60.0
+    mtbf_hours: 8760.0
+    mttr_hours: 4.0
+
+  - unit_id: "CRAC-03"              # Will be assigned STANDBY role
+    q_rated_kw: 50.0
+    efficiency_cop: 3.5
+    min_capacity_pct: 20.0
+    max_capacity_pct: 100.0
+    startup_time_s: 180.0
+    shutdown_time_s: 60.0
+    mtbf_hours: 8760.0
+    mttr_hours: 4.0
+
+# CRAC Staging Configuration
+staging_config:
+  temp_error_threshold: 0.8         # Temperature error for LAG staging (°C)
+  staging_delay_s: 180.0            # Staging delay (seconds) - 3 minutes
+  destaging_delay_s: 300.0          # Destaging delay (seconds) - 5 minutes
+  rotation_runtime_hours: 24.0      # Runtime before rotation (hours) - daily
+  enable_rotation: true             # Enable automatic CRAC rotation
+  staging_hysteresis: 0.2           # Staging hysteresis (°C) - anti-chatter
+  destaging_hysteresis: 0.3         # Destaging hysteresis (°C)
+
+# Simulation Parameters
+simulation:
+  duration_minutes: 60.0            # Simulation duration (minutes)
+  timestep_s: 1.0                   # Simulation timestep (seconds)
+  output_interval_s: 60.0           # Data output interval (seconds)
+  setpoint_c: 22.0                  # Temperature setpoint (°C)
+  random_seed: 42                   # Random seed for reproducibility
+
+# Alarm System Configuration
+alarms:
+  enable_alarms: true               # Enable alarm system
+  high_temp_threshold_c: 27.0       # High temperature alarm (°C)
+  low_temp_threshold_c: 18.0        # Low temperature alarm (°C)
+  alarm_delay_s: 120.0              # Alarm activation delay (seconds)
+
+# Telemetry and Data Collection
+telemetry:
+  enable_csv_export: true           # Enable CSV data export
+  enable_real_time_display: true    # Enable real-time console output
+  csv_output_path: "reports/"       # CSV output directory
+  data_retention_hours: 24.0        # Data retention period (hours)

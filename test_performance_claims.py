@@ -37,12 +37,13 @@ class PerformanceValidator:
         # Create temporary directory for results
         temp_dir = tempfile.mkdtemp()
         
-        # Run simulation
+        # Run simulation with CSV export
         cmd = [
             sys.executable, "main.py", "run",
             "--config", "config/default.yaml",
             "--scenario", scenario,
-            "--set", f"simulation.duration_minutes={duration}"
+            "--set", f"simulation.duration_minutes={duration}",
+            "--export", "csv"
         ]
         
         start_time = time.time()

@@ -1103,11 +1103,6 @@ app.get('/ui', (req, res) => {
 </head>
 <body>
     <div class="container mx-auto px-4 max-w-7xl">
-        <!-- Page Header -->
-        <div class="text-center mb-8 space-y-2">
-            <h1 class="text-4xl font-bold tracking-tight">System Performance Analysis</h1>
-            <p class="text-xl text-muted-foreground">Data Center Building Automation System - Enterprise Dashboard</p>
-        </div>
 
         <!-- Top KPI Summary Strip -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -1142,12 +1137,6 @@ app.get('/ui', (req, res) => {
 
         <!-- Data Center Floorplan Section -->
         <div class="mb-8">
-            <div class="mb-4">
-                <h2 class="text-2xl font-bold tracking-tight flex items-center gap-2">
-                    🏢 Data Center Floorplan
-                </h2>
-                <p class="text-muted-foreground">Live system mimic with real-time temperature monitoring and equipment status</p>
-            </div>
             
             <div class="bg-card text-card-foreground rounded-lg border shadow-sm p-6">
                 <div class="w-full h-96 bg-muted rounded-md overflow-hidden" id="floorplan-container">
@@ -1438,12 +1427,6 @@ app.get('/ui', (req, res) => {
 
         <!-- Engineer Mode Section -->
         <div class="mb-8">
-            <div class="mb-4">
-                <h2 class="text-2xl font-bold tracking-tight flex items-center gap-2">
-                    🔬 Advanced Diagnostics
-                </h2>
-                <p class="text-muted-foreground">Real-time PID controller analysis and system diagnostics</p>
-            </div>
             <div class="bg-card text-card-foreground rounded-lg border shadow-sm p-6" id="engineer-panel">
                 <h3 class="text-lg font-semibold mb-4">PID Controller Analysis</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">

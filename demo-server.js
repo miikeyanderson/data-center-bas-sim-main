@@ -763,7 +763,7 @@ app.get('/ui', (req, res) => {
         
         // Generate SVG for temperature chart
         function generateTemperatureChartSVG(data) {
-            if (!data || data.length < 2) {
+            if (!data || data.length === 0) {
                 return '<div class="flex items-center justify-center h-48 text-muted-foreground">No data available</div>';
             }
             
@@ -780,12 +780,12 @@ app.get('/ui', (req, res) => {
             const maxTemp = Math.max(...temps, setpoint + 1);
             const tempRange = Math.max(2.0, maxTemp - minTemp + 0.5);
             
-            const xScale = chartWidth / (data.length - 1);
+            const xScale = data.length > 1 ? chartWidth / (data.length - 1) : chartWidth / 2;
             const yScale = chartHeight / tempRange;
             
             // Generate path for temperature line
             const tempPath = data.map((d, i) => {
-                const x = margin.left + (i * xScale);
+                const x = data.length === 1 ? margin.left + chartWidth / 2 : margin.left + (i * xScale);
                 const y = margin.top + chartHeight - ((d.temp - minTemp) * yScale);
                 return i === 0 ? 'M ' + x + ' ' + y : 'L ' + x + ' ' + y;
             }).join(' ');
@@ -802,7 +802,7 @@ app.get('/ui', (req, res) => {
             // Generate current value indicator
             let currentValueIndicator = '';
             if (data.length > 0) {
-                const lastX = margin.left + ((data.length - 1) * xScale);
+                const lastX = data.length === 1 ? margin.left + chartWidth / 2 : margin.left + ((data.length - 1) * xScale);
                 const lastY = margin.top + chartHeight - ((data[data.length - 1].temp - minTemp) * yScale);
                 currentValueIndicator = '<circle cx="' + lastX + '" cy="' + lastY + '" r="4" fill="hsl(var(--chart-1))" stroke="white" stroke-width="2" />';
             }
@@ -838,7 +838,7 @@ app.get('/ui', (req, res) => {
         
         // Generate SVG for energy chart
         function generateEnergyChartSVG(data) {
-            if (!data || data.length < 2) {
+            if (!data || data.length === 0) {
                 return '<div class="flex items-center justify-center h-48 text-muted-foreground">No data available</div>';
             }
             
@@ -855,19 +855,19 @@ app.get('/ui', (req, res) => {
             const maxCooling = Math.max(...coolings) * 1.1;
             const maxValue = Math.max(maxPower, maxCooling);
             
-            const xScale = chartWidth / (data.length - 1);
+            const xScale = data.length > 1 ? chartWidth / (data.length - 1) : chartWidth / 2;
             const yScale = chartHeight / maxValue;
             
             // Generate path for power line
             const powerPath = data.map((d, i) => {
-                const x = margin.left + (i * xScale);
+                const x = data.length === 1 ? margin.left + chartWidth / 2 : margin.left + (i * xScale);
                 const y = margin.top + chartHeight - (d.power * yScale);
                 return i === 0 ? 'M ' + x + ' ' + y : 'L ' + x + ' ' + y;
             }).join(' ');
             
             // Generate path for cooling line
             const coolingPath = data.map((d, i) => {
-                const x = margin.left + (i * xScale);
+                const x = data.length === 1 ? margin.left + chartWidth / 2 : margin.left + (i * xScale);
                 const y = margin.top + chartHeight - (d.cooling * yScale);
                 return i === 0 ? 'M ' + x + ' ' + y : 'L ' + x + ' ' + y;
             }).join(' ');
@@ -875,7 +875,7 @@ app.get('/ui', (req, res) => {
             // Generate current value indicators
             let currentValueIndicators = '';
             if (data.length > 0) {
-                const lastX = margin.left + ((data.length - 1) * xScale);
+                const lastX = data.length === 1 ? margin.left + chartWidth / 2 : margin.left + ((data.length - 1) * xScale);
                 const powerY = margin.top + chartHeight - (data[data.length - 1].power * yScale);
                 const coolingY = margin.top + chartHeight - (data[data.length - 1].cooling * yScale);
                 currentValueIndicators = 

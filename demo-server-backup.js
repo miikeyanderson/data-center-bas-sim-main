@@ -648,10 +648,10 @@ app.get('/ui', (req, res) => {
             
             if (chartType === 'temperature') {
                 data = tempData;
-                filename = 'temperature_data_' + timestamp + '.csv';
+                filename = `temperature_data_${timestamp}.csv`;
             } else if (chartType === 'energy') {
                 data = energyData;
-                filename = 'energy_data_' + timestamp + '.csv';
+                filename = `energy_data_${timestamp}.csv`;
             }
             
             if (!data || data.length === 0) return;
@@ -763,9 +763,7 @@ app.get('/ui', (req, res) => {
         
         // Generate SVG for temperature chart
         function generateTemperatureChartSVG(data) {
-            if (!data || data.length < 2) {
-                return '<div class="flex items-center justify-center h-48 text-muted-foreground">No data available</div>';
-            }
+            if (!data || data.length < 2) return '<div class="flex items-center justify-center h-48 text-muted-foreground">No data available</div>';
             
             const width = 800;
             const height = 192;
@@ -799,48 +797,42 @@ app.get('/ui', (req, res) => {
             const toleranceBottom = margin.top + chartHeight - ((setpoint - 0.5 - minTemp) * yScale);
             const tolerancePath = 'M ' + margin.left + ' ' + toleranceTop + ' L ' + (margin.left + chartWidth) + ' ' + toleranceTop + ' L ' + (margin.left + chartWidth) + ' ' + toleranceBottom + ' L ' + margin.left + ' ' + toleranceBottom + ' Z';
             
-            // Generate current value indicator
-            let currentValueIndicator = '';
-            if (data.length > 0) {
-                const lastX = margin.left + ((data.length - 1) * xScale);
-                const lastY = margin.top + chartHeight - ((data[data.length - 1].temp - minTemp) * yScale);
-                currentValueIndicator = '<circle cx="' + lastX + '" cy="' + lastY + '" r="4" fill="hsl(var(--chart-1))" stroke="white" stroke-width="2" />';
-            }
-            
-            const svg = [
-                '<svg width="100%" height="100%" viewBox="0 0 ' + width + ' ' + height + '" class="w-full h-full">',
-                '  <!-- Background -->',
-                '  <rect width="' + width + '" height="' + height + '" fill="hsl(var(--muted))" rx="6" />',
-                '  <!-- Grid lines -->',
-                '  <defs>',
-                '    <pattern id="grid" width="40" height="24" patternUnits="userSpaceOnUse">',
-                '      <path d="M 40 0 L 0 0 0 24" fill="none" stroke="hsl(var(--border))" stroke-width="0.5" opacity="0.3"/>',
-                '    </pattern>',
-                '  </defs>',
-                '  <rect x="' + margin.left + '" y="' + margin.top + '" width="' + chartWidth + '" height="' + chartHeight + '" fill="url(#grid)" />',
-                '  <!-- Tolerance band -->',
-                '  <path d="' + tolerancePath + '" fill="hsl(var(--chart-2))" opacity="0.1" />',
-                '  <!-- Setpoint line -->',
-                '  <path d="' + setpointPath + '" stroke="hsl(var(--chart-2))" stroke-width="2" stroke-dasharray="5,5" fill="none" />',
-                '  <!-- Temperature line -->',
-                '  <path d="' + tempPath + '" stroke="hsl(var(--chart-1))" stroke-width="3" fill="none" />',
-                '  <!-- Y-axis labels -->',
-                '  <text x="10" y="' + (margin.top + 5) + '" fill="hsl(var(--muted-foreground))" font-size="12">' + maxTemp.toFixed(1) + '°F</text>',
-                '  <text x="10" y="' + (setpointY + 5) + '" fill="hsl(var(--muted-foreground))" font-size="12">' + setpoint.toFixed(1) + '°F</text>',
-                '  <text x="10" y="' + (margin.top + chartHeight - 5) + '" fill="hsl(var(--muted-foreground))" font-size="12">' + minTemp.toFixed(1) + '°F</text>',
-                '  <!-- Current value indicator -->',
-                '  ' + currentValueIndicator,
-                '</svg>'
-            ].join('\n');
-            
-            return svg;
+            return `
+                <svg width="100%" height="100%" viewBox="0 0 ${width} ${height}" class="w-full h-full">
+                    <!-- Background -->
+                    <rect width="${width}" height="${height}" fill="hsl(var(--muted))" rx="6" />
+                    
+                    <!-- Grid lines -->
+                    <defs>
+                        <pattern id="grid" width="40" height="24" patternUnits="userSpaceOnUse">
+                            <path d="M 40 0 L 0 0 0 24" fill="none" stroke="hsl(var(--border))" stroke-width="0.5" opacity="0.3"/>
+                        </pattern>
+                    </defs>
+                    <rect x="${margin.left}" y="${margin.top}" width="${chartWidth}" height="${chartHeight}" fill="url(#grid)" />
+                    
+                    <!-- Tolerance band -->
+                    <path d="${tolerancePath}" fill="hsl(var(--chart-2))" opacity="0.1" />
+                    
+                    <!-- Setpoint line -->
+                    <path d="${setpointPath}" stroke="hsl(var(--chart-2))" stroke-width="2" stroke-dasharray="5,5" fill="none" />
+                    
+                    <!-- Temperature line -->
+                    <path d="${tempPath}" stroke="hsl(var(--chart-1))" stroke-width="3" fill="none" />
+                    
+                    <!-- Y-axis labels -->
+                    <text x="10" y="${margin.top + 5}" fill="hsl(var(--muted-foreground))" font-size="12">${maxTemp.toFixed(1)}°F</text>
+                    <text x="10" y="${setpointY + 5}" fill="hsl(var(--muted-foreground))" font-size="12">${setpoint.toFixed(1)}°F</text>
+                    <text x="10" y="${margin.top + chartHeight - 5}" fill="hsl(var(--muted-foreground))" font-size="12">${minTemp.toFixed(1)}°F</text>
+                    
+                    <!-- Current value indicator -->
+                    ${data.length > 0 ? '<circle cx="' + (margin.left + ((data.length - 1) * xScale)) + '" cy="' + (margin.top + chartHeight - ((data[data.length - 1].temp - minTemp) * yScale)) + '" r="4" fill="hsl(var(--chart-1))" stroke="white" stroke-width="2" />' : ''}
+                </svg>
+            `;
         }
         
         // Generate SVG for energy chart
         function generateEnergyChartSVG(data) {
-            if (!data || data.length < 2) {
-                return '<div class="flex items-center justify-center h-48 text-muted-foreground">No data available</div>';
-            }
+            if (!data || data.length < 2) return '<div class="flex items-center justify-center h-48 text-muted-foreground">No data available</div>';
             
             const width = 800;
             const height = 192;
@@ -872,36 +864,31 @@ app.get('/ui', (req, res) => {
                 return i === 0 ? 'M ' + x + ' ' + y : 'L ' + x + ' ' + y;
             }).join(' ');
             
-            // Generate current value indicators
-            let currentValueIndicators = '';
-            if (data.length > 0) {
-                const lastX = margin.left + ((data.length - 1) * xScale);
-                const powerY = margin.top + chartHeight - (data[data.length - 1].power * yScale);
-                const coolingY = margin.top + chartHeight - (data[data.length - 1].cooling * yScale);
-                currentValueIndicators = 
-                    '<circle cx="' + lastX + '" cy="' + powerY + '" r="4" fill="hsl(var(--chart-4))" stroke="white" stroke-width="2" />' +
-                    '<circle cx="' + lastX + '" cy="' + coolingY + '" r="4" fill="hsl(var(--chart-5))" stroke="white" stroke-width="2" />';
-            }
-            
-            const svg = [
-                '<svg width="100%" height="100%" viewBox="0 0 ' + width + ' ' + height + '" class="w-full h-full">',
-                '  <!-- Background -->',
-                '  <rect width="' + width + '" height="' + height + '" fill="hsl(var(--muted))" rx="6" />',
-                '  <!-- Grid lines -->',
-                '  <rect x="' + margin.left + '" y="' + margin.top + '" width="' + chartWidth + '" height="' + chartHeight + '" fill="url(#grid)" />',
-                '  <!-- Power line -->',
-                '  <path d="' + powerPath + '" stroke="hsl(var(--chart-4))" stroke-width="3" fill="none" />',
-                '  <!-- Cooling line -->',
-                '  <path d="' + coolingPath + '" stroke="hsl(var(--chart-5))" stroke-width="3" fill="none" />',
-                '  <!-- Y-axis labels -->',
-                '  <text x="10" y="' + (margin.top + 5) + '" fill="hsl(var(--chart-4))" font-size="12">Power: ' + maxPower.toFixed(0) + 'kW</text>',
-                '  <text x="10" y="' + (margin.top + 20) + '" fill="hsl(var(--chart-5))" font-size="12">Cooling: ' + maxCooling.toFixed(0) + 'kW</text>',
-                '  <!-- Current value indicators -->',
-                '  ' + currentValueIndicators,
-                '</svg>'
-            ].join('\n');
-            
-            return svg;
+            return `
+                <svg width="100%" height="100%" viewBox="0 0 ${width} ${height}" class="w-full h-full">
+                    <!-- Background -->
+                    <rect width="${width}" height="${height}" fill="hsl(var(--muted))" rx="6" />
+                    
+                    <!-- Grid lines -->
+                    <rect x="${margin.left}" y="${margin.top}" width="${chartWidth}" height="${chartHeight}" fill="url(#grid)" />
+                    
+                    <!-- Power line -->
+                    <path d="${powerPath}" stroke="hsl(var(--chart-4))" stroke-width="3" fill="none" />
+                    
+                    <!-- Cooling line -->
+                    <path d="${coolingPath}" stroke="hsl(var(--chart-5))" stroke-width="3" fill="none" />
+                    
+                    <!-- Y-axis labels -->
+                    <text x="10" y="${margin.top + 5}" fill="hsl(var(--chart-4))" font-size="12">Power: ${maxPower.toFixed(0)}kW</text>
+                    <text x="10" y="${margin.top + 20}" fill="hsl(var(--chart-5))" font-size="12">Cooling: ${maxCooling.toFixed(0)}kW</text>
+                    
+                    <!-- Current value indicators -->
+                    ${data.length > 0 ? 
+                        '<circle cx="' + (margin.left + ((data.length - 1) * xScale)) + '" cy="' + (margin.top + chartHeight - (data[data.length - 1].power * yScale)) + '" r="4" fill="hsl(var(--chart-4))" stroke="white" stroke-width="2" />' +
+                        '<circle cx="' + (margin.left + ((data.length - 1) * xScale)) + '" cy="' + (margin.top + chartHeight - (data[data.length - 1].cooling * yScale)) + '" r="4" fill="hsl(var(--chart-5))" stroke="white" stroke-width="2" />'
+                        : ''}
+                </svg>
+            `;
         }
         
         // Generate sparkline SVG
@@ -926,17 +913,12 @@ app.get('/ui', (req, res) => {
                 return i === 0 ? 'M ' + x + ' ' + y : 'L ' + x + ' ' + y;
             }).join(' ');
             
-            const lastX = margin + ((data.length - 1) * xScale);
-            const lastY = margin + (height - 2 * margin) - ((data[data.length - 1].value - minValue) * yScale);
-            
-            const svg = [
-                '<svg width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '">',
-                '  <path d="' + path + '" stroke="' + color + '" stroke-width="2" fill="none" />',
-                '  <circle cx="' + lastX + '" cy="' + lastY + '" r="2" fill="' + color + '" />',
-                '</svg>'
-            ].join('\n');
-            
-            return svg;
+            return `
+                <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+                    <path d="${path}" stroke="${color}" stroke-width="2" fill="none" />
+                    <circle cx="${margin + ((data.length - 1) * xScale)}" cy="${margin + (height - 2 * margin) - ((data[data.length - 1].value - minValue) * yScale)}" r="2" fill="${color}" />
+                </svg>
+            `;
         }
         
         // Update fan animations and RPM displays

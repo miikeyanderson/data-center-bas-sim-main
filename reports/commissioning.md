@@ -3,7 +3,6 @@
 **Project:** Data Center BAS Simulation - CRAC Lead/Lag Control System  
 **System:** 3x 50kW CRAC Units with PID Temperature Control  
 **Date:** 2025-10-07  
-**Commissioning Engineer:** n/a
 **Revision:** 1.0
 
 ---

@@ -1,0 +1,44 @@
+{
+  "scenario": {
+    "name": "Rising IT Load Test",
+    "description": "Gradual increase from 40kW to 80kW over 10 minutes to validate LAG staging",
+    "duration_minutes": 15.0,
+    "setpoint_c": 22.0,
+    "initial_temp_c": 22.0
+  },
+  
+  "room_config": {
+    "initial_temp_c": 22.0,
+    "ambient_temp_c": 22.0,
+    "thermal_mass_kj_per_c": 2500.0,
+    "ua_kw_per_c": 0.25,
+    "it_load_kw": 35.0,
+    "infil_ua_kw_per_c": 0.0,
+    "n_virtual_sensors": 3
+  },
+  
+  "load_profile": {
+    "type": "ramp",
+    "start_time_s": 120.0,
+    "end_time_s": 720.0,
+    "start_load_kw": 35.0,
+    "end_load_kw": 70.0,
+    "description": "Linear ramp from 35kW to 70kW over 10 minutes starting at t=2min"
+  },
+  
+  "expected_behavior": {
+    "lag_staging_time_s": 300.0,
+    "max_temp_error_c": 2.0,
+    "no_high_temp_alarm": true,
+    "lag_staged_by_end": true,
+    "description": "LAG unit should stage within 5 minutes, no HIGH_TEMP alarm should occur"
+  },
+  
+  "validation_criteria": {
+    "max_temperature_c": 24.0,
+    "max_sustained_error_c": 1.5,
+    "min_lag_staging_time_s": 180.0,
+    "max_lag_staging_time_s": 420.0,
+    "alarm_tolerance": ["SENSOR_STUCK"]
+  }
+}

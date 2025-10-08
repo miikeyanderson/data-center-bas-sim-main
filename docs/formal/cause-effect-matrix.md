@@ -1,22 +1,25 @@
-# Data Center HVAC System - Cause & Effect Matrix
+# Data Center HVAC - Cause & Effect Matrix
 
-## Document Information
+### Document Information
 - **System**: Data Center HVAC with N+1 CRAC Units  
 - **Document Version**: 1.0
-- **Date**: 2025-01-08
-- **Performance Validated**: ✅ 90.33% accuracy, COP 2.70, 100% steady-state control
+- **Date**: 2025-10-07
+- **Performance Validated**: 90.33% accuracy, COP 2.70, 100% steady-state control
 
 ---
 
 ## CAUSE & EFFECT MATRIX
 
 ### Legend
-- **●** = Immediate Action (0-5 seconds)
-- **◐** = Delayed Action (5-60 seconds) 
-- **○** = Extended Action (>60 seconds)
-- **A** = Alarm Generated
-- **S** = Safety Interlock
-- **M** = Manual Override Available
+
+| Symbol | Response Time | Description |
+|:------:|---------------|-------------|
+| **●** | 0-5 seconds | Immediate Action |
+| **◐** | 5-60 seconds | Delayed Action |
+| **○** | >60 seconds | Extended Action |
+| **A** | N/A | Alarm Generated |
+| **S** | N/A | Safety Interlock |
+| **M** | N/A | Manual Override Available |
 
 ---
 
@@ -158,8 +161,8 @@
 ---
 
 **Document Control**:
-- **Prepared By**: BAS Controls Engineer
-- **Reviewed By**: Commissioning Agent  
-- **Approved By**: Chief Engineer
-- **Implementation**: All logic validated through simulation testing
-- **Next Review**: Annual or after control modifications
+- **Prepared By**: Michael Anderson
+- **Reviewed By**: n/a
+- **Approved By**: n/a
+- **Implementation**: This document is a formal representation of the control logic and is used to validate the control system.
+- **Next Review**: This document is reviewed annually or after control modifications.

@@ -1,0 +1,62 @@
+# Thermal Challenge Scenario
+# Demonstrates real-world thermal constraints and heat balance engineering
+
+# Override base simulation parameters
+simulation:
+  duration_minutes: 20.0
+  setpoint_c: 22.0
+
+# Challenging thermal conditions
+room:
+  initial_temp_c: 22.0
+  ambient_temp_c: 30.0              # Hot ambient conditions (summer)
+  ua_kw_per_c: 0.25                 # Higher envelope losses (older facility)
+  it_load_kw: 45.0                  # Higher IT load
+  infil_ua_kw_per_c: 0.05           # Infiltration losses (building leakage)
+
+# Conservative PID tuning for stability under challenging conditions
+pid_controller:
+  kp: 5.0                           # Moderate gains to prevent instability
+  ki: 0.2                           # Conservative integral action
+  kd: 0.05                          # Light derivative action
+
+# Slightly more aggressive staging for higher loads
+staging_config:
+  temp_error_threshold: 0.6         # Stage LAG sooner under stress
+  staging_delay_s: 120.0            # Faster staging (2 minutes)
+  destaging_delay_s: 240.0          # Conservative destaging (4 minutes)
+
+# Engineering insights demonstrated
+expected_behavior:
+  thermal_equilibrium_c: 26.5       # Expected steady-state temperature
+  envelope_heat_gain_kw: 2.0        # (30-26.5) * 0.25 + infiltration
+  total_heat_load_kw: 47.5          # IT + envelope + infiltration
+  max_cooling_available_kw: 100.0   # 2x50kW CRACs at 100%
+  heat_balance_achievable: true     # System has sufficient capacity
+  control_challenge: "envelope_losses"
+  
+# Validation criteria (relaxed for challenging conditions)
+validation_criteria:
+  max_temperature_c: 28.0          # Relaxed acceptance criteria
+  max_sustained_error_c: 6.0       # Higher tolerance for envelope losses
+  min_control_accuracy_pct: 70.0   # Lower accuracy expectation
+  expected_equilibrium_range: [25.0, 28.0]  # Realistic for these conditions
+  
+# Educational value
+engineering_insights:
+  demonstrates:
+    - "Heat balance fundamentals: Q_total = Q_IT + Q_envelope + Q_infiltration"
+    - "Envelope design impact on control performance"
+    - "Thermal equilibrium analysis under challenging conditions"
+    - "PID tuning for stability vs performance trade-offs"
+    - "Staging strategy adaptation for high-load conditions"
+  real_world_parallels:
+    - "Legacy data centers with poor envelope design"
+    - "Summer operating conditions in hot climates"
+    - "Facility upgrades with increased IT density"
+    - "Building commissioning thermal challenge tests"
+  mitigation_strategies:
+    - "Envelope improvements (insulation, air sealing)"
+    - "Additional cooling capacity installation"
+    - "Economizer operation during cooler ambient conditions"
+    - "Load balancing across multiple cooling zones"

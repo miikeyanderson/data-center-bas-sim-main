@@ -1,0 +1,61 @@
+# Optimized Demo Scenario
+# Perfect conditions for clean pass/fail results and impressive demonstrations
+
+# Override base simulation parameters
+simulation:
+  duration_minutes: 15.0
+  setpoint_c: 22.0
+
+# Optimized thermal conditions (well-designed modern data center)
+room:
+  initial_temp_c: 22.0
+  ambient_temp_c: 22.0              # Controlled ambient (ideal conditions)
+  ua_kw_per_c: 0.05                 # Excellent envelope (modern construction)
+  it_load_kw: 40.0                  # Standard design load
+  infil_ua_kw_per_c: 0.0            # No infiltration (tight construction)
+
+# Optimized PID tuning for fast, stable response
+pid_controller:
+  kp: 10.0                          # Aggressive proportional for fast response
+  ki: 0.4                           # Strong integral for zero steady-state error
+  kd: 0.1                           # Active derivative for stability
+
+# Standard staging configuration
+staging_config:
+  temp_error_threshold: 0.8         # Standard BAS practice
+  staging_delay_s: 180.0            # 3-minute staging delay
+  destaging_delay_s: 300.0          # 5-minute destaging delay
+
+# Expected perfect performance
+expected_behavior:
+  target_achievement_time_s: 600.0  # Reach setpoint within 10 minutes
+  steady_state_accuracy: 0.2        # ±0.2°C accuracy at steady state
+  overshoot_max_c: 1.0              # Maximum 1°C overshoot during startup
+  control_stability: "excellent"    # Stable, no oscillations
+  
+# Strict validation criteria for demos
+validation_criteria:
+  max_temperature_c: 23.0          # Tight temperature control
+  max_sustained_error_c: 0.5       # Excellent accuracy
+  min_control_accuracy_pct: 95.0   # Near-perfect control
+  max_overshoot_c: 1.5             # Minimal overshoot
+  settling_time_s: 900.0           # 15-minute settling time
+  
+# Demo value
+demonstration_value:
+  showcases:
+    - "Professional BAS control performance under ideal conditions"
+    - "Proper PID tuning for data center applications"
+    - "Lead/lag/standby staging sequence execution"
+    - "Achievement of industry-standard ±0.5°C control accuracy"
+    - "Energy-efficient operation with modulating capacity control"
+  employer_appeal:
+    - "Clean pass/fail results demonstrate system competency"
+    - "Industry-standard performance metrics achieved"
+    - "Professional control system design and tuning"
+    - "Reliable commissioning and acceptance testing capability"
+  technical_highlights:
+    - "Zero steady-state error with integral control"
+    - "Fast response without instability (optimized gains)"
+    - "Automatic equipment staging based on thermal demand"
+    - "Energy tracking and efficiency monitoring"

@@ -1152,20 +1152,20 @@ app.get('/ui', (req, res) => {
             
             <div class="bg-card text-card-foreground rounded-lg border shadow-sm p-6">
                 <div class="w-full h-96 bg-muted rounded-md overflow-hidden" id="floorplan-container">
-                    <svg width="100%" height="100%" viewBox="0 0 800 400" id="floorplan-svg" class="w-full h-full">
+                    <svg width="100%" height="100%" viewBox="0 0 1000 500" id="floorplan-svg" class="w-full h-full">
                         <!-- Room Outline -->
-                        <rect x="10" y="10" width="780" height="380" fill="#f8f9fa" stroke="#34495e" stroke-width="3" rx="5"/>
+                        <rect x="10" y="10" width="980" height="480" fill="#f8f9fa" stroke="#34495e" stroke-width="3" rx="5"/>
                         
                         <!-- Room Label -->
-                        <text x="400" y="35" text-anchor="middle" class="text-sm font-bold fill-foreground">Data Center Room - Zone A</text>
+                        <text x="500" y="35" text-anchor="middle" class="text-sm font-bold fill-foreground">Data Center Room - Zone A</text>
                         
                         <!-- Cold Aisle (Blue) -->
-                        <rect x="50" y="60" width="700" height="80" fill="#dbeafe" stroke="#3b82f6" stroke-width="2" stroke-dasharray="5,5" rx="4"/>
-                        <text x="400" y="105" text-anchor="middle" class="text-xs font-medium fill-blue-600">COLD AISLE - Supply Air 55°F</text>
+                        <rect x="50" y="60" width="800" height="80" fill="#dbeafe" stroke="#3b82f6" stroke-width="2" stroke-dasharray="5,5" rx="4"/>
+                        <text x="450" y="105" text-anchor="middle" class="text-xs font-medium fill-blue-600">COLD AISLE - Supply Air 55°F</text>
                         
                         <!-- Hot Aisle (Red) -->
-                        <rect x="50" y="260" width="700" height="80" fill="#fef2f2" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,5" rx="4"/>
-                        <text x="400" y="305" text-anchor="middle" class="text-xs font-medium fill-red-600">HOT AISLE - Return Air 75°F</text>
+                        <rect x="50" y="300" width="800" height="80" fill="#fef2f2" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,5" rx="4"/>
+                        <text x="450" y="345" text-anchor="middle" class="text-xs font-medium fill-red-600">HOT AISLE - Return Air 75°F</text>
                         
                         <!-- Server Racks Row 1 (facing cold aisle) -->
                         <g id="rack-row-1">
@@ -1274,64 +1274,64 @@ app.get('/ui', (req, res) => {
                         
                         <!-- CRAC-02 (Center) -->
                         <g id="crac-02" class="crac-unit" data-crac="CRAC-02">
-                            <rect x="375" y="350" width="50" height="40" fill="#3498db" stroke="#2980b9" stroke-width="3" rx="5"/>
-                            <text x="400" y="368" text-anchor="middle" class="text-xs fill-white font-bold">CRAC-02</text>
-                            <text x="400" y="380" text-anchor="middle" class="text-xs fill-white">LAG</text>
-                            <circle cx="385" cy="385" r="4" fill="#5dade2"/>
+                            <rect x="450" y="400" width="100" height="60" fill="#3498db" stroke="#2980b9" stroke-width="3" rx="5"/>
+                            <text x="500" y="425" text-anchor="middle" class="text-sm fill-white font-bold">CRAC-02</text>
+                            <text x="500" y="440" text-anchor="middle" class="text-xs fill-white">LAG</text>
+                            <circle cx="480" cy="450" r="6" fill="#5dade2"/>
                             <!-- Fan indicator -->
                             <g id="crac-02-fan" class="fan-indicator">
-                                <circle cx="410" cy="360" r="6" fill="none" stroke="#ffffff" stroke-width="1"/>
-                                <g id="crac-02-blades" transform-origin="410 360">
-                                    <path d="M 410,355 L 410,365 M 405,360 L 415,360" stroke="#ffffff" stroke-width="1.5"/>
-                                    <path d="M 407,357 L 413,363 M 407,363 L 413,357" stroke="#ffffff" stroke-width="1"/>
+                                <circle cx="520" cy="420" r="8" fill="none" stroke="#ffffff" stroke-width="1"/>
+                                <g id="crac-02-blades" transform-origin="520 420">
+                                    <path d="M 520,412 L 520,428 M 512,420 L 528,420" stroke="#ffffff" stroke-width="1.5"/>
+                                    <path d="M 514,414 L 526,426 M 514,426 L 526,414" stroke="#ffffff" stroke-width="1"/>
                                 </g>
-                                <text id="crac-02-rpm" x="410" y="375" text-anchor="middle" class="text-xs fill-white">800</text>
-                                <text x="410" y="385" text-anchor="middle" class="text-xs fill-white">RPM</text>
+                                <text id="crac-02-rpm" x="520" y="435" text-anchor="middle" class="text-xs fill-white">800</text>
+                                <text x="520" y="445" text-anchor="middle" class="text-xs fill-white">RPM</text>
                             </g>
                             <!-- Valve position indicator -->
                             <g id="crac-02-valve" class="valve-indicator">
-                                <rect x="380" y="355" width="10" height="20" fill="none" stroke="#ffffff" stroke-width="1" rx="1"/>
-                                <rect id="crac-02-valve-pos" x="381" y="370" width="8" height="0" fill="#5dade2">
-                                    <animate attributeName="height" values="0;14;0" dur="4s" repeatCount="indefinite"/>
-                                    <animate attributeName="y" values="370;356;370" dur="4s" repeatCount="indefinite"/>
+                                <rect x="460" y="410" width="12" height="25" fill="none" stroke="#ffffff" stroke-width="1" rx="1"/>
+                                <rect id="crac-02-valve-pos" x="461" y="430" width="10" height="0" fill="#5dade2">
+                                    <animate attributeName="height" values="0;20;0" dur="4s" repeatCount="indefinite"/>
+                                    <animate attributeName="y" values="430;410;430" dur="4s" repeatCount="indefinite"/>
                                 </rect>
-                                <text id="crac-02-valve-pct" x="385" y="350" text-anchor="middle" class="text-xs fill-white">45%</text>
-                                <text x="385" y="380" text-anchor="middle" class="text-xs fill-white">Valve</text>
+                                <text id="crac-02-valve-pct" x="466" y="405" text-anchor="middle" class="text-xs fill-white">45%</text>
+                                <text x="466" y="450" text-anchor="middle" class="text-xs fill-white">Valve</text>
                             </g>
                             <!-- Airflow arrows -->
-                            <path d="M 390 340 L 390 350 M 385 345 L 390 350 L 395 345" stroke="#3498db" stroke-width="2" fill="none"/>
-                            <path d="M 400 340 L 400 350 M 395 345 L 400 350 L 405 345" stroke="#3498db" stroke-width="2" fill="none"/>
-                            <path d="M 410 340 L 410 350 M 405 345 L 410 350 L 415 345" stroke="#3498db" stroke-width="2" fill="none"/>
+                            <path d="M 480 390 L 480 400 M 475 395 L 480 400 L 485 395" stroke="#3498db" stroke-width="2" fill="none"/>
+                            <path d="M 500 390 L 500 400 M 495 395 L 500 400 L 505 395" stroke="#3498db" stroke-width="2" fill="none"/>
+                            <path d="M 520 390 L 520 400 M 515 395 L 520 400 L 525 395" stroke="#3498db" stroke-width="2" fill="none"/>
                         </g>
                         
                         <!-- CRAC-03 (Right) -->
                         <g id="crac-03" class="crac-unit" data-crac="CRAC-03">
-                            <rect x="730" y="160" width="50" height="80" fill="#95a5a6" stroke="#7f8c8d" stroke-width="3" rx="5"/>
-                            <text x="755" y="185" text-anchor="middle" class="text-xs fill-white font-bold">CRAC</text>
-                            <text x="755" y="200" text-anchor="middle" class="text-xs fill-white font-bold">03</text>
-                            <text x="755" y="215" text-anchor="middle" class="text-xs fill-white">STANDBY</text>
-                            <circle cx="755" cy="225" r="6" fill="#bdc3c7" class="status-indicator"/>
+                            <rect x="850" y="160" width="80" height="100" fill="#95a5a6" stroke="#7f8c8d" stroke-width="3" rx="5"/>
+                            <text x="890" y="195" text-anchor="middle" class="text-sm fill-white font-bold">CRAC</text>
+                            <text x="890" y="210" text-anchor="middle" class="text-sm fill-white font-bold">03</text>
+                            <text x="890" y="225" text-anchor="middle" class="text-xs fill-white">STANDBY</text>
+                            <circle cx="890" cy="240" r="8" fill="#bdc3c7" class="status-indicator"/>
                             <!-- Fan indicator -->
                             <g id="crac-03-fan" class="fan-indicator">
-                                <circle cx="740" cy="170" r="8" fill="none" stroke="#ffffff" stroke-width="1"/>
-                                <g id="crac-03-blades" transform-origin="740 170">
-                                    <path d="M 740,162 L 740,178 M 732,170 L 748,170" stroke="#ffffff" stroke-width="2"/>
-                                    <path d="M 734,164 L 746,176 M 734,176 L 746,164" stroke="#ffffff" stroke-width="1"/>
+                                <circle cx="870" cy="180" r="10" fill="none" stroke="#ffffff" stroke-width="1"/>
+                                <g id="crac-03-blades" transform-origin="870 180">
+                                    <path d="M 870,170 L 870,190 M 860,180 L 880,180" stroke="#ffffff" stroke-width="2"/>
+                                    <path d="M 862,172 L 878,188 M 862,188 L 878,172" stroke="#ffffff" stroke-width="1"/>
                                 </g>
-                                <text id="crac-03-rpm" x="740" y="185" text-anchor="middle" class="text-xs fill-white">0</text>
-                                <text x="740" y="195" text-anchor="middle" class="text-xs fill-white">RPM</text>
+                                <text id="crac-03-rpm" x="870" y="200" text-anchor="middle" class="text-xs fill-white">0</text>
+                                <text x="870" y="212" text-anchor="middle" class="text-xs fill-white">RPM</text>
                             </g>
                             <!-- Valve position indicator -->
                             <g id="crac-03-valve" class="valve-indicator">
-                                <rect x="750" y="165" width="15" height="30" fill="none" stroke="#ffffff" stroke-width="1" rx="2"/>
-                                <rect id="crac-03-valve-pos" x="751" y="190" width="13" height="0" fill="#bdc3c7"/>
-                                <text id="crac-03-valve-pct" x="757" y="175" text-anchor="middle" class="text-xs fill-white">0%</text>
-                                <text x="757" y="205" text-anchor="middle" class="text-xs fill-white">Valve</text>
+                                <rect x="910" y="175" width="15" height="35" fill="none" stroke="#ffffff" stroke-width="1" rx="2"/>
+                                <rect id="crac-03-valve-pos" x="911" y="205" width="13" height="0" fill="#bdc3c7"/>
+                                <text id="crac-03-valve-pct" x="917" y="170" text-anchor="middle" class="text-xs fill-white">0%</text>
+                                <text x="917" y="220" text-anchor="middle" class="text-xs fill-white">Valve</text>
                             </g>
                         </g>
                         
                         <!-- Temperature Legend -->
-                        <g id="temp-legend" transform="translate(620, 50)">
+                        <g id="temp-legend" transform="translate(750, 50)">
                             <rect x="0" y="0" width="160" height="90" fill="rgba(255,255,255,0.9)" stroke="#34495e" stroke-width="1" rx="3"/>
                             <text x="80" y="15" text-anchor="middle" class="text-xs font-bold fill-foreground">Temperature Status</text>
                             

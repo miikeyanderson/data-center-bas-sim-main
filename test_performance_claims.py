@@ -138,13 +138,13 @@ class PerformanceValidator:
         }
     
     def validate_baseline(self) -> bool:
-        """Test Optimized Demo scenario (realistic baseline)"""
+        """Test baseline scenario with documentation claims"""
         print("\n" + "="*60)
-        print("🧪 VALIDATING OPTIMIZED DEMO SCENARIO")
-        print("Testing: System reaches setpoint and maintains stable control")
+        print("🧪 VALIDATING BASELINE SCENARIO")
+        print("Testing: 95.8% accuracy within ±0.5°C, COP ≥2.94")
         print("="*60)
         
-        csv_path, run_info = self.run_scenario("baseline", duration=15.0)
+        csv_path, run_info = self.run_scenario("baseline", duration=60.0)
         analysis = self.analyze_csv(csv_path)
         
         temp = analysis['temperature']
@@ -156,17 +156,24 @@ class PerformanceValidator:
         print(f"   Avg Error: {temp['avg_error_c']:.3f}°C")
         print(f"   Final Temp: {temp['avg_temp_c']:.1f}°C (Target: 22.0°C)")
         
-        # Realistic validation criteria for current system performance
-        accuracy_ok = temp['accuracy_pct'] >= 2.0   # System achieves some accuracy
-        convergence_ok = temp['avg_error_c'] <= 3.0  # System converges reasonably
-        stability_ok = temp['std_dev_c'] <= 4.0     # System is reasonably stable
+        # Documentation-level validation criteria  
+        accuracy_ok = temp['accuracy_pct'] >= 95.0  # Documentation claim: 95.8%
+        convergence_ok = temp['avg_error_c'] <= 0.5  # Documentation standard
+        stability_ok = temp['std_dev_c'] <= 0.3     # Documentation standard
+        
+        # Calculate steady-state performance (exclude first 5 minutes)
+        total_samples = temp['in_range_samples'] + (analysis['sample_count'] - temp['in_range_samples'])
+        steady_state_start = int(5 * 60)  # 5 minutes in seconds
+        if analysis['sample_count'] > steady_state_start:
+            steady_state_ratio = (analysis['sample_count'] - steady_state_start) / analysis['sample_count']
+            print(f"   Steady-state analysis: {steady_state_ratio*100:.1f}% of simulation")
         
         passed = accuracy_ok and convergence_ok and stability_ok
         
-        print(f"✅ Accuracy: {'PASS' if accuracy_ok else 'FAIL'}")
-        print(f"✅ Convergence: {'PASS' if convergence_ok else 'FAIL'}")  
-        print(f"✅ Stability: {'PASS' if stability_ok else 'FAIL'}")
-        print(f"🏆 Optimized Demo Overall: {'PASS' if passed else 'FAIL'}")
+        print(f"✅ Accuracy: {'PASS' if accuracy_ok else 'FAIL'} (Target: ≥95.0%)")
+        print(f"✅ Convergence: {'PASS' if convergence_ok else 'FAIL'} (Target: ≤0.5°C)")  
+        print(f"✅ Stability: {'PASS' if stability_ok else 'FAIL'} (Target: ≤0.3°C)")
+        print(f"🏆 Baseline Overall: {'PASS' if passed else 'FAIL'}")
         
         self.results['baseline'] = {
             'passed': passed,
@@ -183,7 +190,7 @@ class PerformanceValidator:
         print("Expected: 98.5% within ±0.5°C; COP 2.94; LAG stages at 180s")
         print("="*60)
         
-        csv_path, run_info = self.run_scenario("rising_load", duration=15.0)
+        csv_path, run_info = self.run_scenario("rising_load", duration=30.0)
         analysis = self.analyze_csv(csv_path)
         
         temp = analysis['temperature']
@@ -196,9 +203,9 @@ class PerformanceValidator:
         print(f"   LAG Staged: {'Yes' if equipment['lag_staged'] else 'No'} (Expected: Yes)")
         print(f"   LAG Staged Count: {equipment['lag_staged_count']}")
         
-        # Validation with reasonable tolerances
-        accuracy_ok = temp['accuracy_pct'] >= 85.0    # Relaxed from 98.5%
-        cop_ok = abs(energy['avg_cop'] - 2.94) <= 0.5  # ±0.5 tolerance
+        # Documentation-level validation
+        accuracy_ok = temp['accuracy_pct'] >= 95.0    # Documentation standard
+        cop_ok = energy['avg_cop'] >= 2.9              # Documentation COP target
         staging_ok = equipment['lag_staged']             # LAG should stage
         
         passed = accuracy_ok and cop_ok and staging_ok
@@ -223,7 +230,7 @@ class PerformanceValidator:
         print("Expected: 96.2% within ±0.5°C; Standby promoted <15s; CRAC_FAIL alarm")
         print("="*60)
         
-        csv_path, run_info = self.run_scenario("crac_failure", duration=10.0)
+        csv_path, run_info = self.run_scenario("crac_failure", duration=20.0)
         analysis = self.analyze_csv(csv_path)
         
         temp = analysis['temperature']
@@ -235,9 +242,9 @@ class PerformanceValidator:
         print(f"   Alarms Triggered: {len(alarms)} (Expected: CRAC_FAIL)")
         print(f"   System Recovery: {'Yes' if temp['accuracy_pct'] > 80 else 'No'}")
         
-        # Validation criteria
-        accuracy_ok = temp['accuracy_pct'] >= 80.0    # Relaxed for failure scenario
-        recovery_ok = temp['avg_error_c'] <= 3.0      # System should recover
+        # Documentation-level validation for failure scenario
+        accuracy_ok = temp['accuracy_pct'] >= 90.0    # High reliability even during failures
+        recovery_ok = temp['avg_error_c'] <= 1.0      # System should recover quickly
         
         passed = accuracy_ok and recovery_ok
         
